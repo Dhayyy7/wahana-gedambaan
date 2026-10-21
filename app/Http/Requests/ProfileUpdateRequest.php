@@ -18,6 +18,13 @@ class ProfileUpdateRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
+            'username' => [
+                'nullable',
+                'string',
+                'max:50',
+                'alpha_dash',
+                Rule::unique(User::class)->ignore($this->user()->id),
+            ],
             'email' => [
                 'required',
                 'string',
@@ -26,6 +33,23 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+        ];
+    }
+
+    /**
+     * Pesan validasi bahasa Indonesia.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'Nama lengkap wajib diisi.',
+            'username.unique' => 'Username sudah digunakan oleh akun lain.',
+            'username.alpha_dash' => 'Username hanya boleh berupa huruf, angka, tanda hubung, dan garis bawah.',
+            'email.required' => 'Alamat email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Alamat email sudah terdaftar pada akun lain.',
         ];
     }
 }
