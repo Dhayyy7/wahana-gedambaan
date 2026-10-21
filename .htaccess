@@ -1,0 +1,10 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Cegah akses langsung ke file sensitif dan sistem
+    RewriteRule ^\.env - [F,L,NC]
+    RewriteRule ^\.git - [F,L,NC]
+
+    # Arahkan semua request ke folder public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
