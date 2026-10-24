@@ -80,37 +80,50 @@
                             <i class="fa-solid fa-house w-5 text-center text-base"></i>
                             <span>Dashboard</span>
                         </a>
-                        <!-- Kapal -->
+                        <!-- Kapal (Hanya Superadmin) -->
+                        @if (Auth::user()->isSuperadmin())
                         <a href="{{ route('admin.kapal.index') }}"
                             class="flex items-center gap-3.5 px-4 py-3 text-sm font-medium rounded-2xl transition duration-150 {{ request()->routeIs('admin.kapal.*') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-slate-500 hover:text-blue-600 hover:bg-slate-50' }}">
                             <i class="fa-solid fa-ship w-5 text-center text-base"></i>
                             <span>Kapal</span>
                         </a>
-                        <!-- Pemesanan -->
+                        @endif
+
+                        <!-- Pemesanan (Superadmin & Kasir) -->
+                        @if (Auth::user()->isSuperadmin() || Auth::user()->isKasir())
                         <a href="{{ route('admin.tiket.index') }}"
                             class="flex items-center gap-3.5 px-4 py-3 text-sm font-medium rounded-2xl transition duration-150 {{ request()->routeIs('admin.tiket.*') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-slate-500 hover:text-blue-600 hover:bg-slate-50' }}">
                             <i class="fa-solid fa-calendar-days w-5 text-center text-base"></i>
                             <span>Pemesanan</span>
                         </a>
-                        <!-- Scan Tiket (Operator) -->
+                        @endif
+
+                        <!-- Scan Tiket (Superadmin & Operator) -->
+                        @if (Auth::user()->isSuperadmin() || Auth::user()->isOperator())
                         <a href="{{ route('admin.scan.index') }}"
                             class="flex items-center gap-3.5 px-4 py-3 text-sm font-medium rounded-2xl transition duration-150 {{ request()->routeIs('admin.scan.*') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-slate-500 hover:text-blue-600 hover:bg-slate-50' }}">
                             <i class="fa-solid fa-qrcode w-5 text-center text-base"></i>
                             <span>Scan Tiket</span>
                         </a>
-                        <!-- Users (Superadmin, Kasir, Operator) -->
+                        @endif
+
+                        <!-- Users (Hanya Superadmin) -->
+                        @if (Auth::user()->isSuperadmin())
                         <a href="{{ route('admin.users.index') }}"
                             class="flex items-center gap-3.5 px-4 py-3 text-sm font-medium rounded-2xl transition duration-150 {{ request()->routeIs('admin.users.*') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-slate-500 hover:text-blue-600 hover:bg-slate-50' }}">
                             <i class="fa-solid fa-users-gear w-5 text-center text-base"></i>
                             <span>Users</span>
                         </a>
+                        @endif
 
-                        <!-- Laporan -->
+                        <!-- Laporan (Superadmin & Kasir) -->
+                        @if (Auth::user()->isSuperadmin() || Auth::user()->isKasir())
                         <a href="{{ route('admin.laporan.index') }}"
                             class="flex items-center gap-3.5 px-4 py-3 text-sm font-medium rounded-2xl {{ request()->routeIs('admin.laporan.*') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-slate-500 hover:text-blue-600 hover:bg-slate-50' }} transition duration-150">
                             <i class="fa-solid fa-chart-line w-5 text-center text-base"></i>
                             <span>Laporan</span>
                         </a>
+                        @endif
 
                         <!-- Pengaturan -->
                         <a href="{{ route('profile.edit') }}"
@@ -164,7 +177,8 @@
                         <i class="fa-solid fa-bars text-xl"></i>
                     </button>
 
-                    <!-- Search Input -->
+                    <!-- Search Input (Khusus Superadmin & Kasir) -->
+                    @if (Auth::user()->isSuperadmin() || Auth::user()->isKasir())
                     <form method="GET" action="{{ route('admin.tiket.index') }}" class="relative w-full max-w-xs sm:max-w-sm lg:max-w-md">
                         <div
                             class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -173,6 +187,7 @@
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari pemesanan, pelanggan, atau kapal..."
                             class="w-full pl-10 pr-4 py-2.5 bg-slate-50 hover:bg-slate-100/80 focus:bg-white text-xs sm:text-sm text-slate-700 placeholder-slate-400 rounded-2xl border border-slate-200/80 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition outline-none" />
                     </form>
+                    @endif
                 </div>
 
                 <!-- Right: Notifications & Profile -->

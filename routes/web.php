@@ -14,30 +14,40 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
-    // Dashboard
+    // Dashboard (Semua role: Superadmin, Kasir, Operator)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Manajemen Kapal
-    Route::resource('kapal', KapalController::class);
+    // Manajemen Kapal (Khusus Superadmin)
+    Route::middleware('role:superadmin')->group(function () {
+        Route::resource('kapal', KapalController::class);
+    });
 
-    // Pemesanan / Tiket
-    Route::get('tiket/{tiket}/print', [TiketController::class, 'print'])->name('tiket.print');
-    Route::patch('tiket/{tiket}/cancel', [TiketController::class, 'cancel'])->name('tiket.cancel');
-    Route::resource('tiket', TiketController::class);
+    // Pemesanan / Tiket (Superadmin & Kasir)
+    Route::middleware('role:superadmin,kasir')->group(function () {
+        Route::get('tiket/{tiket}/print', [TiketController::class, 'print'])->name('tiket.print');
+        Route::patch('tiket/{tiket}/cancel', [TiketController::class, 'cancel'])->name('tiket.cancel');
+        Route::resource('tiket', TiketController::class);
+    });
 
-    // Scan Tiket (Operator Wahana)
-    Route::get('scan', [ScanController::class, 'index'])->name('scan.index');
-    Route::post('scan/process', [ScanController::class, 'process'])->name('scan.process');
-    Route::post('scan/selesai-trip/{kapal}', [ScanController::class, 'selesaiTrip'])->name('scan.selesai-trip');
+    // Scan Tiket (Superadmin & Operator)
+    Route::middleware('role:superadmin,operator')->group(function () {
+        Route::get('scan', [ScanController::class, 'index'])->name('scan.index');
+        Route::post('scan/process', [ScanController::class, 'process'])->name('scan.process');
+        Route::post('scan/selesai-trip/{kapal}', [ScanController::class, 'selesaiTrip'])->name('scan.selesai-trip');
+    });
 
-    // Manajemen Pengguna (Users: Superadmin, Kasir, Operator)
-    Route::resource('users', UserController::class);
+    // Manajemen Pengguna (Khusus Superadmin)
+    Route::middleware('role:superadmin')->group(function () {
+        Route::resource('users', UserController::class);
+    });
 
-    // Laporan Transaksi Bulanan
-    Route::get('laporan', [LaporanController::class, 'index'])->name('laporan.index');
-    Route::get('laporan/export-excel', [LaporanController::class, 'exportExcel'])->name('laporan.export-excel');
-    Route::get('laporan/export-csv', [LaporanController::class, 'exportCsv'])->name('laporan.export-csv');
-    Route::get('laporan/export', [LaporanController::class, 'export'])->name('laporan.export');
+    // Laporan Transaksi Bulanan (Superadmin & Kasir)
+    Route::middleware('role:superadmin,kasir')->group(function () {
+        Route::get('laporan', [LaporanController::class, 'index'])->name('laporan.index');
+        Route::get('laporan/export-excel', [LaporanController::class, 'exportExcel'])->name('laporan.export-excel');
+        Route::get('laporan/export-csv', [LaporanController::class, 'exportCsv'])->name('laporan.export-csv');
+        Route::get('laporan/export', [LaporanController::class, 'export'])->name('laporan.export');
+    });
 });
 
 // Alias agar route('dashboard') tetap bekerja
