@@ -12,7 +12,7 @@
         }
 
         @page {
-            size: 58mm auto;
+            size: 58mm 155mm;
             margin: 0;
         }
 

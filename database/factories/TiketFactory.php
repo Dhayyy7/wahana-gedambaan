@@ -19,8 +19,10 @@ class TiketFactory extends Factory
      */
     public function definition(): array
     {
+        static $sequence = 1;
+
         return [
-            'kode_tiket' => Tiket::generateKodeTiket(),
+            'kode_tiket' => sprintf('TKT-%s-%04d', now()->format('Ymd'), $sequence++),
             'kapal_id' => Kapal::factory(),
             'nama_pembeli' => fake()->name(),
             'no_hp' => fake()->phoneNumber(),

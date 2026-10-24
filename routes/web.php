@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KapalController;
+use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\Admin\ScanController;
 use App\Http\Controllers\Admin\TiketController;
 use App\Http\Controllers\Admin\UserController;
@@ -31,6 +32,12 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
 
     // Manajemen Pengguna (Users: Superadmin, Kasir, Operator)
     Route::resource('users', UserController::class);
+
+    // Laporan Transaksi Bulanan
+    Route::get('laporan', [LaporanController::class, 'index'])->name('laporan.index');
+    Route::get('laporan/export-excel', [LaporanController::class, 'exportExcel'])->name('laporan.export-excel');
+    Route::get('laporan/export-csv', [LaporanController::class, 'exportCsv'])->name('laporan.export-csv');
+    Route::get('laporan/export', [LaporanController::class, 'export'])->name('laporan.export');
 });
 
 // Alias agar route('dashboard') tetap bekerja

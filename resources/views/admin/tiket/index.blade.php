@@ -94,13 +94,80 @@
         </div>
     </div>
 
+    {{-- Search & Status Filter Bar --}}
+    <div class="bg-white rounded-3xl p-4 sm:p-5 border border-slate-100 shadow-xs mb-6">
+        <form method="GET" action="{{ route('admin.tiket.index') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            {{-- Input Search --}}
+            <div class="relative flex-1">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                </div>
+                <input type="text" name="search" value="{{ $search ?? '' }}"
+                    placeholder="Cari kode tiket, nama pembeli, no HP, atau nama kapal..."
+                    class="w-full pl-10 pr-4 py-2.5 bg-slate-50 hover:bg-slate-100/80 focus:bg-white text-xs sm:text-sm text-slate-700 placeholder-slate-400 rounded-2xl border border-slate-200/80 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition outline-none" />
+            </div>
+
+            {{-- Filter Status Dropdown --}}
+            <div class="sm:w-56">
+                <select name="status" onchange="this.form.submit()"
+                    class="w-full text-xs sm:text-sm font-medium rounded-2xl border-slate-200/80 bg-slate-50 hover:bg-slate-100/80 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 py-2.5 px-3.5 transition cursor-pointer">
+                    <option value="all" {{ ($status ?? 'all') === 'all' ? 'selected' : '' }}>Semua Status</option>
+                    <option value="0" {{ (string) ($status ?? '') === '0' ? 'selected' : '' }}>Belum Digunakan</option>
+                    <option value="1" {{ (string) ($status ?? '') === '1' ? 'selected' : '' }}>Sudah Digunakan</option>
+                    <option value="-1" {{ (string) ($status ?? '') === '-1' ? 'selected' : '' }}>Dibatalkan</option>
+                </select>
+            </div>
+
+            {{-- Submit & Reset Buttons --}}
+            <div class="flex items-center gap-2">
+                <button type="submit"
+                    class="py-2.5 px-5 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-sm shadow-blue-200 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-filter"></i>
+                    <span>Cari</span>
+                </button>
+
+                @if (!empty($search) || (!empty($status) && $status !== 'all'))
+                    <a href="{{ route('admin.tiket.index') }}"
+                        class="p-2.5 bg-slate-100 hover:bg-slate-200 active:scale-98 text-slate-600 rounded-2xl transition"
+                        title="Reset Pencarian & Filter">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </a>
+                @endif
+            </div>
+        </form>
+    </div>
+
     {{-- Table --}}
-    <div class="bg-white rounded-2xl border border-slate-100 shadow-xs overflow-hidden">
+    <div class="bg-white rounded-3xl border border-slate-100 shadow-xs overflow-hidden">
+        {{-- Table Top Info --}}
+        <div class="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between text-xs text-slate-500">
+            <div>
+                Menampilkan <strong class="text-slate-800 font-semibold">{{ $tikets->firstItem() ?? 0 }} - {{ $tikets->lastItem() ?? 0 }}</strong> dari <strong class="text-slate-800 font-semibold">{{ $tikets->total() }}</strong> total transaksi (10 per halaman)
+            </div>
+            @if (!empty($search) || (!empty($status) && $status !== 'all'))
+                <span class="text-blue-600 font-medium bg-blue-50 px-2.5 py-0.5 rounded-full text-[11px]">
+                    Filter aktif
+                </span>
+            @endif
+        </div>
+
         @if ($tikets->isEmpty())
             <div class="flex flex-col items-center justify-center py-20 text-slate-400">
                 <i class="fa-solid fa-ticket text-5xl mb-4 opacity-30"></i>
-                <p class="font-semibold text-slate-500">Belum ada tiket</p>
-                <p class="text-sm mt-1">Klik "Buat Tiket" untuk membuat pemesanan baru.</p>
+                <p class="font-semibold text-slate-600 text-base">Tidak ada transaksi ditemukan</p>
+                <p class="text-xs text-slate-400 mt-1">
+                    @if (!empty($search) || (!empty($status) && $status !== 'all'))
+                        Tidak ada tiket yang cocok dengan kata kunci atau filter status yang dipilih.
+                    @else
+                        Belum ada tiket pemesanan yang tercatat di sistem.
+                    @endif
+                </p>
+                @if (!empty($search) || (!empty($status) && $status !== 'all'))
+                    <a href="{{ route('admin.tiket.index') }}" class="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-blue-50 text-blue-600 text-xs font-bold hover:bg-blue-100 transition">
+                        <i class="fa-solid fa-rotate-left"></i>
+                        Reset Filter
+                    </a>
+                @endif
             </div>
         @else
             <div class="overflow-x-auto">

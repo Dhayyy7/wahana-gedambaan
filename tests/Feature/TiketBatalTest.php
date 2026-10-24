@@ -93,4 +93,40 @@ class TiketBatalTest extends TestCase
             'code' => 'TICKET_CANCELLED',
         ]);
     }
+
+    public function test_daftar_tiket_memiliki_pagination_10_pencarian_dan_filter_status(): void
+    {
+        $kasir = User::factory()->create(['role' => User::ROLE_KASIR]);
+        $kapal = Kapal::factory()->create(['nama_kapal' => 'Speedboat Express']);
+
+        // Buat 12 tiket
+        Tiket::factory()->count(11)->create([
+            'kapal_id' => $kapal->id,
+            'status' => Tiket::STATUS_PENDING,
+        ]);
+
+        $tiketSpesifik = Tiket::factory()->create([
+            'kapal_id' => $kapal->id,
+            'nama_pembeli' => 'Pelanggan Unik XYZ',
+            'status' => Tiket::STATUS_BATAL,
+        ]);
+
+        // Cek pagination 10 items
+        $response = $this->actingAs($kasir)->get(route('admin.tiket.index'));
+        $response->assertStatus(200);
+        $this->assertCount(10, $response->viewData('tikets'));
+        $this->assertEquals(12, $response->viewData('tikets')->total());
+
+        // Cek search
+        $responseSearch = $this->actingAs($kasir)->get(route('admin.tiket.index', ['search' => 'Unik XYZ']));
+        $responseSearch->assertStatus(200);
+        $responseSearch->assertSee('Pelanggan Unik XYZ');
+        $this->assertEquals(1, $responseSearch->viewData('tikets')->total());
+
+        // Cek filter status dibatalkan (-1)
+        $responseFilter = $this->actingAs($kasir)->get(route('admin.tiket.index', ['status' => Tiket::STATUS_BATAL]));
+        $responseFilter->assertStatus(200);
+        $responseFilter->assertSee('Pelanggan Unik XYZ');
+        $this->assertEquals(1, $responseFilter->viewData('tikets')->total());
+    }
 }

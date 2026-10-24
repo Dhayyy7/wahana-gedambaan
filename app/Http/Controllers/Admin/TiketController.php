@@ -8,21 +8,46 @@ use App\Models\Kapal;
 use App\Models\Tiket;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class TiketController extends Controller
 {
     /**
-     * Daftar semua tiket (riwayat transaksi).
+     * Daftar semua tiket (riwayat transaksi) dengan pagination 10 per halaman, pencarian, dan filter status.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
-        $tikets = Tiket::with('kapal')
-            ->latest('tanggal_pemesanan')
-            ->paginate(15);
+        $search = $request->input('search');
+        $status = $request->input('status', 'all');
 
-        return view('admin.tiket.index', compact('tikets'));
+        $query = Tiket::with('kapal');
+
+        if ($request->filled('search')) {
+            $keyword = trim((string) $search);
+            $query->where(function ($q) use ($keyword) {
+                $q->where('kode_tiket', 'like', "%{$keyword}%")
+                    ->orWhere('nama_pembeli', 'like', "%{$keyword}%")
+                    ->orWhere('no_hp', 'like', "%{$keyword}%")
+                    ->orWhere('alamat', 'like', "%{$keyword}%")
+                    ->orWhereHas('kapal', function ($kq) use ($keyword) {
+                        $kq->where('nama_kapal', 'like', "%{$keyword}%")
+                            ->orWhere('kode_kapal', 'like', "%{$keyword}%");
+                    });
+            });
+        }
+
+        if ($status !== 'all' && $status !== '' && $status !== null) {
+            $query->where('status', (int) $status);
+        }
+
+        $tikets = $query
+            ->latest('tanggal_pemesanan')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('admin.tiket.index', compact('tikets', 'search', 'status'));
     }
 
     /**

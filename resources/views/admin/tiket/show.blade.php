@@ -79,7 +79,7 @@
             @if ($tiket->status === -1)
                 <div class="bg-rose-50 border-b border-rose-200 px-6 py-3 text-center text-xs font-bold text-rose-700 flex items-center justify-center gap-2">
                     <i class="fa-solid fa-ban text-rose-600"></i>
-                    <span>Pesanan tiket ini telah DIBATALKAN (Status -1) dan tidak berlaku lagi.</span>
+                    <span>Pesanan tiket ini telah DIBATALKAN dan tidak berlaku lagi.</span>
                 </div>
             @endif
 

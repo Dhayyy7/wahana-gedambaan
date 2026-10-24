@@ -106,8 +106,8 @@
                         </a>
 
                         <!-- Laporan -->
-                        <a href="#"
-                            class="flex items-center gap-3.5 px-4 py-3 text-sm font-medium rounded-2xl text-slate-500 hover:text-blue-600 hover:bg-slate-50 transition duration-150">
+                        <a href="{{ route('admin.laporan.index') }}"
+                            class="flex items-center gap-3.5 px-4 py-3 text-sm font-medium rounded-2xl {{ request()->routeIs('admin.laporan.*') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-slate-500 hover:text-blue-600 hover:bg-slate-50' }} transition duration-150">
                             <i class="fa-solid fa-chart-line w-5 text-center text-base"></i>
                             <span>Laporan</span>
                         </a>
@@ -165,14 +165,14 @@
                     </button>
 
                     <!-- Search Input -->
-                    <div class="relative w-full max-w-xs sm:max-w-sm lg:max-w-md">
+                    <form method="GET" action="{{ route('admin.tiket.index') }}" class="relative w-full max-w-xs sm:max-w-sm lg:max-w-md">
                         <div
                             class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                             <i class="fa-solid fa-magnifying-glass text-sm"></i>
                         </div>
-                        <input type="text" placeholder="Cari pemesanan, pelanggan, atau kapal..."
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari pemesanan, pelanggan, atau kapal..."
                             class="w-full pl-10 pr-4 py-2.5 bg-slate-50 hover:bg-slate-100/80 focus:bg-white text-xs sm:text-sm text-slate-700 placeholder-slate-400 rounded-2xl border border-slate-200/80 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition outline-none" />
-                    </div>
+                    </form>
                 </div>
 
                 <!-- Right: Notifications & Profile -->
