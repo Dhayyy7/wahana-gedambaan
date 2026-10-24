@@ -239,6 +239,13 @@
 
         <div class="divider-double"></div>
 
+        @if ($tiket->status === -1)
+            <div style="border: 2px dashed #000; padding: 4px; text-align: center; margin: 4px 0; font-weight: bold; font-size: 11px; letter-spacing: 0.5px;">
+                *** TIKET DIBATALKAN / VOID ***
+            </div>
+            <div class="divider-dashed"></div>
+        @endif
+
         <!-- Info Tiket -->
         <table class="info-table">
             <tr>
@@ -334,12 +341,14 @@
     </div>
 
     <script>
-        // Otomatis buka dialog cetak saat halaman dibuka
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                window.print();
-            }, 300);
-        });
+        // Otomatis buka dialog cetak saat halaman dibuka langsung di tab baru (bukan di dalam iframe)
+        if (window.self === window.top) {
+            window.addEventListener('load', function() {
+                setTimeout(function() {
+                    window.print();
+                }, 300);
+            });
+        }
     </script>
 </body>
 </html>

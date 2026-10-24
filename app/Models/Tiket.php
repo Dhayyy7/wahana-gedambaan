@@ -27,6 +27,8 @@ class Tiket extends Model
         'tanggal_scan',
     ];
 
+    public const STATUS_BATAL = -1;
+
     public const STATUS_PENDING = 0;
 
     public const STATUS_SELESAI = 1;
@@ -56,6 +58,22 @@ class Tiket extends Model
     }
 
     /**
+     * Apakah tiket sudah dibatalkan?
+     */
+    public function isDibatalkan(): bool
+    {
+        return $this->status === self::STATUS_BATAL;
+    }
+
+    /**
+     * Apakah tiket masih pending (belum digunakan & belum dibatalkan)?
+     */
+    public function isPending(): bool
+    {
+        return $this->status === self::STATUS_PENDING;
+    }
+
+    /**
      * Apakah tiket sudah digunakan/di-scan operator?
      */
     public function isSudahDigunakan(): bool
@@ -64,11 +82,20 @@ class Tiket extends Model
     }
 
     /**
+     * Apakah tiket masih bisa dibatalkan oleh kasir/admin?
+     */
+    public function canBeCancelled(): bool
+    {
+        return $this->status === self::STATUS_PENDING;
+    }
+
+    /**
      * Label status tiket untuk tampilan UI.
      */
     public function getStatusLabelAttribute(): string
     {
         return match ($this->status) {
+            self::STATUS_BATAL => 'Dibatalkan',
             self::STATUS_PENDING => 'Belum Digunakan',
             self::STATUS_SELESAI => 'Sudah Digunakan',
             default => 'Tidak Diketahui',
@@ -81,6 +108,7 @@ class Tiket extends Model
     public function getStatusBadgeClassAttribute(): string
     {
         return match ($this->status) {
+            self::STATUS_BATAL => 'bg-rose-50 text-rose-700 border-rose-200',
             self::STATUS_PENDING => 'bg-amber-50 text-amber-700 border-amber-200',
             self::STATUS_SELESAI => 'bg-emerald-50 text-emerald-700 border-emerald-200',
             default => 'bg-slate-50 text-slate-600 border-slate-200',

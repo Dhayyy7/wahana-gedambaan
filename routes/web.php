@@ -21,6 +21,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
 
     // Pemesanan / Tiket
     Route::get('tiket/{tiket}/print', [TiketController::class, 'print'])->name('tiket.print');
+    Route::patch('tiket/{tiket}/cancel', [TiketController::class, 'cancel'])->name('tiket.cancel');
     Route::resource('tiket', TiketController::class);
 
     // Scan Tiket (Operator Wahana)

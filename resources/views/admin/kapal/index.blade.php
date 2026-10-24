@@ -159,7 +159,13 @@
                                             <i class="fa-solid fa-pen-to-square text-sm"></i>
                                         </a>
                                         <form method="POST" action="{{ route('admin.kapal.destroy', $kapal) }}"
-                                            onsubmit="return confirm('Yakin ingin menghapus kapal {{ addslashes($kapal->nama_kapal) }}? Tindakan ini tidak bisa dibatalkan.')">
+                                            onsubmit="return confirmAction(event, {
+                                                title: 'Hapus Unit Kapal?',
+                                                text: 'Yakin ingin menghapus kapal {{ addslashes($kapal->nama_kapal) }} ({{ $kapal->kode_kapal }})? Data kapal ini akan dihapus permanen.',
+                                                type: 'danger',
+                                                confirmText: 'Ya, Hapus Kapal',
+                                                cancelText: 'Batal'
+                                            })">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit"

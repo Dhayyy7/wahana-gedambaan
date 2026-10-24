@@ -265,6 +265,141 @@
 
     </div>
 
+    {{-- ================= GLOBAL CONFIRMATION MODAL (MENGGANTIKAN WINDOW.CONFIRM BROWSER) ================= --}}
+    <div id="global-confirm-modal" class="hidden fixed inset-0 z-[100] overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen p-4 text-center">
+            {{-- Backdrop --}}
+            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" onclick="window.closeGlobalConfirmModal()"></div>
+
+            {{-- Modal Panel --}}
+            <div class="relative bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-100 text-center overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200">
+                {{-- Dynamic Icon Box --}}
+                <div id="global-modal-icon-box" class="w-16 h-16 rounded-3xl flex items-center justify-center text-3xl mx-auto mb-4 border shadow-2xs">
+                    <i id="global-modal-icon" class="fa-solid"></i>
+                </div>
+
+                {{-- Dynamic Title --}}
+                <h3 id="global-modal-title" class="text-xl font-extrabold text-slate-800 tracking-tight"></h3>
+
+                {{-- Dynamic Text --}}
+                <p id="global-modal-text" class="text-sm text-slate-500 mt-2 leading-relaxed"></p>
+
+                {{-- Buttons --}}
+                <div class="flex items-center gap-3 mt-6">
+                    <button type="button" onclick="window.closeGlobalConfirmModal()" id="global-modal-cancel-btn"
+                        class="w-1/2 py-2.5 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition">
+                        Batal
+                    </button>
+                    <button type="button" id="global-modal-confirm-btn"
+                        class="w-1/2 py-2.5 px-4 rounded-2xl font-bold text-sm shadow-md transition flex items-center justify-center gap-2">
+                        <span>Konfirmasi</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let globalConfirmCallback = null;
+
+        window.confirmAction = function(event, options = {}) {
+            let form = null;
+            if (event) {
+                if (event.target) {
+                    form = event.target.tagName === 'FORM' ? event.target : event.target.closest('form');
+                }
+                if (!form && event.currentTarget) {
+                    form = event.currentTarget.tagName === 'FORM' ? event.currentTarget : event.currentTarget.closest('form');
+                }
+            }
+
+            if (form && form.dataset && form.dataset.confirmed === 'true') {
+                return true;
+            }
+
+            if (event) {
+                if (typeof event.preventDefault === 'function') {
+                    event.preventDefault();
+                }
+                if (typeof event.stopPropagation === 'function') {
+                    event.stopPropagation();
+                }
+            }
+
+            const title = options.title || 'Konfirmasi Tindakan';
+            const text = options.text || 'Apakah Anda yakin ingin melanjutkan tindakan ini?';
+            const type = options.type || 'warning'; // warning, danger, info
+            const confirmText = options.confirmText || 'Ya, Lanjutkan';
+            const cancelText = options.cancelText || 'Batal';
+
+            window.openGlobalConfirmModal({
+                title,
+                text,
+                type,
+                confirmText,
+                cancelText,
+                onConfirm: function() {
+                    if (form && (form.tagName === 'FORM' || form instanceof HTMLFormElement)) {
+                        form.dataset.confirmed = 'true';
+                        HTMLFormElement.prototype.submit.call(form);
+                    } else if (typeof options.onConfirm === 'function') {
+                        options.onConfirm();
+                    }
+                }
+            });
+
+            return false;
+        };
+
+        window.openGlobalConfirmModal = function(options) {
+            const modal = document.getElementById('global-confirm-modal');
+            const iconBox = document.getElementById('global-modal-icon-box');
+            const icon = document.getElementById('global-modal-icon');
+            const titleEl = document.getElementById('global-modal-title');
+            const textEl = document.getElementById('global-modal-text');
+            const confirmBtn = document.getElementById('global-modal-confirm-btn');
+            const cancelBtn = document.getElementById('global-modal-cancel-btn');
+
+            titleEl.textContent = options.title;
+            textEl.textContent = options.text;
+            confirmBtn.querySelector('span').textContent = options.confirmText || 'Konfirmasi';
+            cancelBtn.textContent = options.cancelText || 'Batal';
+
+            const type = options.type || 'warning';
+            if (type === 'danger') {
+                iconBox.className = 'w-16 h-16 rounded-3xl bg-rose-50 text-rose-600 border border-rose-100 flex items-center justify-center text-3xl mx-auto mb-4 shadow-2xs';
+                icon.className = 'fa-solid fa-triangle-exclamation';
+                confirmBtn.className = 'w-1/2 py-2.5 px-4 rounded-2xl bg-rose-600 hover:bg-rose-700 active:scale-98 text-white font-bold text-sm shadow-md shadow-rose-200 transition flex items-center justify-center gap-2 cursor-pointer';
+            } else if (type === 'warning') {
+                iconBox.className = 'w-16 h-16 rounded-3xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center text-3xl mx-auto mb-4 shadow-2xs';
+                icon.className = 'fa-solid fa-circle-exclamation';
+                confirmBtn.className = 'w-1/2 py-2.5 px-4 rounded-2xl bg-amber-600 hover:bg-amber-700 active:scale-98 text-white font-bold text-sm shadow-md shadow-amber-200 transition flex items-center justify-center gap-2 cursor-pointer';
+            } else {
+                iconBox.className = 'w-16 h-16 rounded-3xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center text-3xl mx-auto mb-4 shadow-2xs';
+                icon.className = 'fa-solid fa-circle-question';
+                confirmBtn.className = 'w-1/2 py-2.5 px-4 rounded-2xl bg-blue-600 hover:bg-blue-700 active:scale-98 text-white font-bold text-sm shadow-md shadow-blue-200 transition flex items-center justify-center gap-2 cursor-pointer';
+            }
+
+            globalConfirmCallback = options.onConfirm;
+            confirmBtn.onclick = function() {
+                const callback = globalConfirmCallback;
+                window.closeGlobalConfirmModal();
+                if (typeof callback === 'function') {
+                    callback();
+                }
+            };
+
+            modal.classList.remove('hidden');
+        };
+
+        window.closeGlobalConfirmModal = function() {
+            const modal = document.getElementById('global-confirm-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+            globalConfirmCallback = null;
+        };
+    </script>
 </body>
 
 </html>

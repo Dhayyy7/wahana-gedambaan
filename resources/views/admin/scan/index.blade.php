@@ -230,6 +230,145 @@
 
     </div>
 
+    {{-- ================= MODAL KONFIRMASI NAIK (TIKET SUDAH SESUAI) ================= --}}
+    <div id="modal-confirm-boarding" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen p-4 text-center">
+            {{-- Backdrop --}}
+            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" onclick="cancelBoarding()"></div>
+
+            {{-- Modal Panel --}}
+            <div class="relative bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-100 text-left overflow-hidden transform transition-all">
+                {{-- Header Icon & Status --}}
+                <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl shrink-0 border border-emerald-100 shadow-2xs">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div>
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+                                Terverifikasi Valid
+                            </span>
+                            <h3 class="text-lg font-extrabold text-slate-800 mt-0.5">Tiket Sudah Sesuai</h3>
+                        </div>
+                    </div>
+                    <button type="button" onclick="cancelBoarding()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-600 flex items-center justify-center transition">
+                        <i class="fa-solid fa-xmark text-sm"></i>
+                    </button>
+                </div>
+
+                {{-- Tiket Data Card --}}
+                <div class="my-4 bg-slate-50/80 rounded-2xl p-4 border border-slate-100 space-y-2.5 text-xs">
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-500 font-medium">Kode Tiket</span>
+                        <span id="modal-boarding-kode" class="font-mono font-extrabold text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-lg border border-blue-200"></span>
+                    </div>
+                    <div class="flex items-center justify-between pt-1.5 border-t border-slate-200/60">
+                        <span class="text-slate-500 font-medium">Nama Pengunjung</span>
+                        <div class="text-right">
+                            <p id="modal-boarding-pembeli" class="font-bold text-slate-800 text-sm"></p>
+                            <p id="modal-boarding-nohp" class="text-[11px] text-slate-400 font-mono"></p>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between pt-1.5 border-t border-slate-200/60">
+                        <span class="text-slate-500 font-medium">Kapal Wahana</span>
+                        <div class="text-right">
+                            <p id="modal-boarding-kapal" class="font-extrabold text-slate-800 text-sm"></p>
+                            <span id="modal-boarding-kode-kapal" class="text-[10px] font-mono text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200"></span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between pt-1.5 border-t border-slate-200/60">
+                        <span class="text-slate-500 font-medium">Total Bayar</span>
+                        <span id="modal-boarding-total" class="font-extrabold text-emerald-600 text-sm"></span>
+                    </div>
+                </div>
+
+                {{-- Pertanyaan Alert Prompt --}}
+                <div class="bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200 p-4 rounded-2xl text-center mb-5 shadow-2xs">
+                    <p class="text-[11px] text-emerald-800 uppercase tracking-wider font-bold mb-1">Konfirmasi Naik Penumpang</p>
+                    <p class="text-base font-extrabold text-emerald-950 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-person-walking-arrow-right text-emerald-600 text-lg"></i>
+                        <span>Tiket sudah sesuai, Silahkan naik?</span>
+                    </p>
+                    <p class="text-[11px] text-emerald-700 mt-1">
+                        Pilih <strong>"Ya"</strong> untuk mengizinkan naik & memulai trip kapal, atau <strong>"Tidak"</strong> untuk membatalkan.
+                    </p>
+                </div>
+
+                {{-- Tombol Aksi (Ya / Tidak) --}}
+                <div class="flex items-center gap-3">
+                    <button type="button" onclick="cancelBoarding()"
+                        class="w-1/3 py-3 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition text-center">
+                        <i class="fa-solid fa-xmark mr-1"></i> Tidak
+                    </button>
+                    <button type="button" id="btn-submit-boarding" onclick="confirmBoarding()"
+                        class="w-2/3 py-3 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-bold text-sm shadow-md shadow-emerald-200 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-circle-check text-base"></i>
+                        <span>Ya, Silahkan Naik</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- ================= MODAL KONFIRMASI SELESAI TRIP KAPAL ================= --}}
+    <div id="modal-confirm-selesai-trip" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen p-4 text-center">
+            {{-- Backdrop --}}
+            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" onclick="closeSelesaiTripModal()"></div>
+
+            {{-- Modal Panel --}}
+            <div class="relative bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-100 text-center overflow-hidden transform transition-all">
+                {{-- Icon Selesai --}}
+                <div class="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl mx-auto mb-4 border border-emerald-100 shadow-xs">
+                    <i class="fa-solid fa-anchor"></i>
+                </div>
+
+                <h3 class="text-xl font-extrabold text-slate-800 tracking-tight">Selesaikan Trip Kapal?</h3>
+
+                <p class="text-sm text-slate-500 mt-2 leading-relaxed">
+                    Selesaikan trip kapal <span class="font-extrabold text-slate-800" id="modal-selesai-nama-kapal"></span> sekarang?
+                </p>
+
+                <div class="mt-4 p-3 bg-sky-50 rounded-2xl border border-sky-100 text-xs text-sky-800 text-left flex items-start gap-2.5">
+                    <i class="fa-solid fa-circle-info text-sky-600 mt-0.5 shrink-0"></i>
+                    <span>Kapal telah kembali bersandar di dermaga. Status unit kapal akan kembali <strong>Tersedia</strong> untuk melayani tiket berikutnya.</span>
+                </div>
+
+                {{-- Tombol Aksi --}}
+                <div class="flex items-center gap-3 mt-6">
+                    <button type="button" onclick="closeSelesaiTripModal()"
+                        class="w-1/2 py-2.5 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition">
+                        Batal
+                    </button>
+                    <button type="button" id="btn-submit-selesai-trip" onclick="submitSelesaiTrip()"
+                        class="w-1/2 py-2.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-bold text-sm shadow-md shadow-emerald-200 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Ya, Selesaikan</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- ================= MODAL NOTIFIKASI UMUM (MENGGANTIKAN ALERT BROWSER) ================= --}}
+    <div id="modal-notification" class="hidden fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen p-4 text-center">
+            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" onclick="closeNotificationModal()"></div>
+            <div class="relative bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center overflow-hidden transform transition-all">
+                <div id="notif-icon-box" class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-3 shadow-xs">
+                    <i id="notif-icon" class="fa-solid"></i>
+                </div>
+                <h4 id="notif-title" class="text-lg font-extrabold text-slate-800"></h4>
+                <p id="notif-message" class="text-xs text-slate-500 mt-1.5 leading-relaxed"></p>
+                <button type="button" onclick="closeNotificationModal()"
+                    class="mt-5 w-full py-2.5 px-4 rounded-2xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs transition">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
     {{-- ================= JAVASCRIPT SCANNER LOGIC ================= --}}
     <script>
         // CSRF Token Setup
@@ -244,8 +383,11 @@
         let currentCameraIndex = 0;
         let isProcessing = false; // Debounce flag agar tidak scan berkali-kali saat frame kamera jalan
 
+        // State untuk modal konfirmasi
+        let pendingTicketPayload = null;
+        let pendingSelesaiKapalId = null;
+
         // ================= AUDIO SYNTHESIZER (WEB AUDIO API) =================
-        // Menghasilkan bunyi Beep (Sukses) dan Buzzer (Gagal) tanpa file eksternal
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx = null;
 
@@ -266,7 +408,6 @@
                 const gain = audioCtx.createGain();
 
                 osc.type = 'sine';
-                // Frekuensi naik: nada gembira C5 -> G5
                 osc.frequency.setValueAtTime(523.25, now);
                 osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.12);
 
@@ -307,6 +448,32 @@
             }
         }
 
+        // ================= NOTIFICATION MODAL HELPER (Pengganti alert) =================
+        function showNotificationModal(type, title, message) {
+            const modal = document.getElementById('modal-notification');
+            const iconBox = document.getElementById('notif-icon-box');
+            const icon = document.getElementById('notif-icon');
+            const titleEl = document.getElementById('notif-title');
+            const messageEl = document.getElementById('notif-message');
+
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+
+            if (type === 'success') {
+                iconBox.className = 'w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-3 shadow-xs bg-emerald-50 text-emerald-600 border border-emerald-100';
+                icon.className = 'fa-solid fa-circle-check';
+            } else {
+                iconBox.className = 'w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-3 shadow-xs bg-rose-50 text-rose-600 border border-rose-100';
+                icon.className = 'fa-solid fa-triangle-exclamation';
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeNotificationModal() {
+            document.getElementById('modal-notification').classList.add('hidden');
+        }
+
         // ================= CAMERA CONTROLS =================
         async function toggleCamera() {
             initAudio();
@@ -331,11 +498,10 @@
 
                 cameraList = await Html5Qrcode.getCameras();
                 if (!cameraList || cameraList.length === 0) {
-                    alert('Tidak ada kamera yang terdeteksi di perangkat ini.');
+                    showNotificationModal('error', 'Kamera Tidak Ditemukan', 'Tidak ada kamera yang terdeteksi di perangkat ini.');
                     return;
                 }
 
-                // Default prioritaskan kamera belakang (environment) jika ada
                 let selectedId = cameraList[0].id;
                 for (let i = 0; i < cameraList.length; i++) {
                     const label = cameraList[i].label.toLowerCase();
@@ -357,12 +523,10 @@
                 await html5QrCode.start(
                     currentCameraId,
                     config,
-                    (decodedText, decodedResult) => {
+                    (decodedText) => {
                         handleQrScanned(decodedText);
                     },
-                    (errorMessage) => {
-                        // Frame scanning (ignore continuous read misses)
-                    }
+                    () => {}
                 );
 
                 isCameraRunning = true;
@@ -377,7 +541,7 @@
 
             } catch (err) {
                 console.error("Camera start error:", err);
-                alert("Gagal mengakses kamera: " + (err.message || err));
+                showNotificationModal('error', 'Gagal Membuka Kamera', err.message || 'Periksa izin kamera pada browser Anda.');
                 stopCamera();
             }
         }
@@ -417,10 +581,9 @@
 
         // ================= SCAN PROCESSING LOGIC =================
         function handleQrScanned(qrCode) {
-            if (isProcessing) return; // Prevent spamming duplicate frames
+            if (isProcessing) return;
             isProcessing = true;
 
-            // Pause camera frame visual if supported
             sendScanRequest(qrCode);
         }
 
@@ -431,13 +594,13 @@
             if (!code) return;
 
             sendScanRequest(code);
-            input.value = '';
         }
 
+        // Tahap 1: Verifikasi Tiket (confirm = false)
         async function sendScanRequest(qrCode) {
             const resultContainer = document.getElementById('scan-result-container');
             resultContainer.innerHTML = `
-                <div class="p-5 bg-white rounded-3xl border border-blue-100 shadow-sm flex items-center justify-center gap-3 text-blue-600">
+                <div class="p-5 bg-white rounded-3xl border border-blue-100 shadow-xs flex items-center justify-center gap-3 text-blue-600">
                     <i class="fa-solid fa-circle-notch fa-spin text-xl"></i>
                     <span class="text-sm font-semibold">Memverifikasi tiket...</span>
                 </div>
@@ -452,20 +615,21 @@
                         'X-CSRF-TOKEN': csrfToken,
                         'Accept': 'application/json',
                     },
-                    body: JSON.stringify({ qr_code: qrCode }),
+                    body: JSON.stringify({ qr_code: qrCode, confirm: false }),
                 });
 
                 const data = await response.json();
 
                 if (response.ok && data.success) {
-                    // SUKSES
+                    // Tiket valid & siap naik -> Tampilkan Modal Konfirmasi "Tiket sudah sesuai, Silahkan naik (Ya/tidak)"
                     playSuccessBeep();
-                    renderSuccessResult(data.data, data.message);
-                    updateStats();
+                    dismissResult();
+                    openBoardingModal(qrCode, data.data);
                 } else {
-                    // GAGAL
+                    // Gagal validasi (tiket tidak ada, sudah dipakai, dibatalkan, atau kapal berlayar)
                     playErrorBuzzer();
                     renderErrorResult(data);
+                    isProcessing = false;
                 }
 
             } catch (err) {
@@ -474,11 +638,83 @@
                 renderErrorResult({
                     message: "Terjadi kesalahan jaringan atau server tidak merespons. Periksa koneksi internet.",
                 });
-            } finally {
-                // Beri jeda 2.5 detik sebelum scanner kamera siap memindai QR code berikutnya
-                setTimeout(() => {
+                isProcessing = false;
+            }
+        }
+
+        // Buka Modal Konfirmasi Naik
+        function openBoardingModal(qrCode, tiket) {
+            pendingTicketPayload = qrCode;
+
+            document.getElementById('modal-boarding-kode').textContent = tiket.kode_tiket;
+            document.getElementById('modal-boarding-pembeli').textContent = tiket.nama_pembeli;
+            document.getElementById('modal-boarding-nohp').textContent = tiket.no_hp || '-';
+            document.getElementById('modal-boarding-kapal').textContent = tiket.kapal.nama_kapal;
+            document.getElementById('modal-boarding-kode-kapal').textContent = tiket.kapal.kode_kapal;
+            document.getElementById('modal-boarding-total').textContent = 'Rp ' + Number(tiket.total_bayar).toLocaleString('id-ID');
+
+            document.getElementById('modal-confirm-boarding').classList.remove('hidden');
+        }
+
+        // Operator Pilih "Tidak / Batal"
+        function cancelBoarding() {
+            document.getElementById('modal-confirm-boarding').classList.add('hidden');
+            pendingTicketPayload = null;
+            document.getElementById('manual-qr-input').value = '';
+            document.getElementById('manual-qr-input').focus();
+
+            // Beri jeda 800ms sebelum scanner kamera siap lagi agar tidak men-scan frame yang sama
+            setTimeout(() => {
+                isProcessing = false;
+            }, 800);
+        }
+
+        // Operator Pilih "Ya, Silahkan Naik" -> Tahap 2: Eksekusi (confirm = true)
+        async function confirmBoarding() {
+            if (!pendingTicketPayload) return;
+
+            const btnSubmit = document.getElementById('btn-submit-boarding');
+            const originalContent = btnSubmit.innerHTML;
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i><span>Memproses...</span>`;
+
+            try {
+                const response = await fetch(processUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({ qr_code: pendingTicketPayload, confirm: true }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    // Berhasil naik
+                    playSuccessBeep();
+                    document.getElementById('modal-confirm-boarding').classList.add('hidden');
+                    document.getElementById('manual-qr-input').value = '';
+
+                    renderSuccessResult(data.data, data.message);
+                    updateStats();
+                } else {
+                    playErrorBuzzer();
+                    document.getElementById('modal-confirm-boarding').classList.add('hidden');
+                    renderErrorResult(data);
                     isProcessing = false;
-                }, 2500);
+                }
+            } catch (err) {
+                console.error("Confirmation error:", err);
+                playErrorBuzzer();
+                document.getElementById('modal-confirm-boarding').classList.add('hidden');
+                showNotificationModal('error', 'Gagal Memproses', 'Terjadi kesalahan saat menyimpan data verifikasi.');
+                isProcessing = false;
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = originalContent;
+                pendingTicketPayload = null;
             }
         }
 
@@ -494,7 +730,7 @@
                             </div>
                             <div>
                                 <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Verifikasi Berhasil</span>
-                                <h3 class="text-xl font-extrabold mt-0.5 leading-tight">Tiket Valid — Siap Naik</h3>
+                                <h3 class="text-xl font-extrabold mt-0.5 leading-tight">Penumpang Naik — Kapal Berlayar</h3>
                             </div>
                         </div>
                         <button onclick="dismissResult()" class="text-white/70 hover:text-white p-1 text-lg">
@@ -524,18 +760,18 @@
                     </div>
 
                     <div class="mt-3 text-center text-xs text-emerald-100 font-medium">
-                        <i class="fa-solid fa-info-circle mr-1"></i> Status kapal otomatis beralih ke <strong>Sedang Berlayar</strong>.
+                        <i class="fa-solid fa-circle-info mr-1"></i> Status kapal otomatis beralih ke <strong>Sedang Berlayar</strong>.
                     </div>
                 </div>
             `;
+            container.classList.remove('hidden');
 
-            // Tambahkan entri baru ke live scan log secara visual
             addEntryToLog(item);
 
-            // Reload status kapal berlayar setelah 1 detik
+            // Reload status kapal berlayar setelah 2 detik
             setTimeout(() => {
                 location.reload();
-            }, 2500);
+            }, 2000);
         }
 
         function renderErrorResult(err) {
@@ -545,6 +781,8 @@
 
             if (code === 'ALREADY_USED') {
                 title = '1 Tiket Hanya 1x Perjalanan!';
+            } else if (code === 'TICKET_CANCELLED') {
+                title = 'Tiket Sudah Dibatalkan!';
             } else if (code === 'KAPAL_BUSY') {
                 title = 'Kapal Masih Berlayar!';
             } else if (code === 'NOT_FOUND') {
@@ -569,7 +807,7 @@
                     </div>
 
                     <div class="mt-4 pt-4 border-t border-white/20 text-sm font-medium leading-relaxed bg-white/10 p-4 rounded-2xl backdrop-blur-2xs">
-                        ${err.message}
+                        ${err.message || 'Tiket tidak memenuhi syarat verifikasi.'}
                     </div>
 
                     <div class="mt-3 text-right">
@@ -579,6 +817,7 @@
                     </div>
                 </div>
             `;
+            container.classList.remove('hidden');
         }
 
         function dismissResult() {
@@ -618,14 +857,28 @@
             }
         }
 
-        // ================= SELESAI TRIP MANUAL =================
-        async function selesaiTrip(kapalId, namaKapal) {
-            if (!confirm(`Selesaikan trip kapal "${namaKapal}" sekarang? Status kapal akan kembali Tersedia.`)) {
-                return;
-            }
+        // ================= SELESAI TRIP KAPAL (MODAL CUSTOM TANPA BROWSER ALERT) =================
+        function selesaiTrip(kapalId, namaKapal) {
+            pendingSelesaiKapalId = kapalId;
+            document.getElementById('modal-selesai-nama-kapal').textContent = `"${namaKapal}"`;
+            document.getElementById('modal-confirm-selesai-trip').classList.remove('hidden');
+        }
+
+        function closeSelesaiTripModal() {
+            document.getElementById('modal-confirm-selesai-trip').classList.add('hidden');
+            pendingSelesaiKapalId = null;
+        }
+
+        async function submitSelesaiTrip() {
+            if (!pendingSelesaiKapalId) return;
+
+            const btnSubmit = document.getElementById('btn-submit-selesai-trip');
+            const originalContent = btnSubmit.innerHTML;
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i><span>Memproses...</span>`;
 
             try {
-                const res = await fetch(`${selesaiTripUrlBase}/${kapalId}`, {
+                const res = await fetch(`${selesaiTripUrlBase}/${pendingSelesaiKapalId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -635,14 +888,22 @@
                 });
 
                 const data = await res.json();
+                closeSelesaiTripModal();
+
                 if (res.ok && data.success) {
-                    alert(data.message);
-                    location.reload();
+                    showNotificationModal('success', 'Trip Kapal Selesai!', data.message);
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1400);
                 } else {
-                    alert('Gagal: ' + (data.message || 'Terjadi kesalahan'));
+                    showNotificationModal('error', 'Gagal Selesai Trip', data.message || 'Terjadi kesalahan pada server.');
                 }
             } catch (e) {
-                alert('Gagal menghubungi server.');
+                closeSelesaiTripModal();
+                showNotificationModal('error', 'Koneksi Gagal', 'Gagal menghubungi server untuk menyelesaikan trip.');
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = originalContent;
             }
         }
 

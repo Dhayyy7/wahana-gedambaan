@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreTiketRequest;
 use App\Models\Kapal;
 use App\Models\Tiket;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -109,10 +110,41 @@ class TiketController extends Controller
     }
 
     /**
-     * Hapus tiket (hanya tiket pending yang boleh dihapus).
+     * Batalkan pesanan tiket (kasir salah input).
+     * Status diubah menjadi -1 (STATUS_BATAL) agar riwayat tetap tersimpan untuk audit
+     * dan mencegah manipulasi/penghapusan transaksi fiktif di kasir.
+     */
+    public function cancel(Tiket $tiket): RedirectResponse
+    {
+        if ($tiket->isSudahDigunakan()) {
+            return back()->withErrors(['error' => 'Tiket yang sudah digunakan tidak dapat dibatalkan.']);
+        }
+
+        if ($tiket->isDibatalkan()) {
+            return back()->withErrors(['error' => "Tiket {$tiket->kode_tiket} sudah berstatus dibatalkan sebelumnya."]);
+        }
+
+        $tiket->update([
+            'status' => Tiket::STATUS_BATAL,
+        ]);
+
+        return redirect()
+            ->back()
+            ->with('success', "Pesanan tiket {$tiket->kode_tiket} berhasil dibatalkan.");
+    }
+
+    /**
+     * Hapus tiket (hanya Superadmin yang berhak menghapus data transaksi tiket, kasir tidak diizinkan untuk menghindari fake transaksi).
      */
     public function destroy(Tiket $tiket): RedirectResponse
     {
+        /** @var User $user */
+        $user = auth()->user();
+
+        if (! $user->isSuperadmin()) {
+            return back()->withErrors(['error' => 'Kasir tidak diizinkan menghapus transaksi. Gunakan aksi Batalkan Pesanan jika terjadi salah input.']);
+        }
+
         if ($tiket->isSudahDigunakan()) {
             return back()->withErrors(['error' => 'Tiket yang sudah digunakan tidak dapat dihapus.']);
         }

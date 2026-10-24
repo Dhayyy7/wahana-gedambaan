@@ -47,6 +47,7 @@ class ScanController extends Controller
         ]);
 
         $payload = trim($request->input('qr_code'));
+        $confirm = $request->boolean('confirm', false);
 
         // Cari tiket berdasarkan UUID qr_code atau kode_tiket (misal: TKT-20261018-0001)
         $tiket = Tiket::with('kapal')
@@ -63,7 +64,22 @@ class ScanController extends Controller
             ], 404);
         }
 
-        // 2. Validasi 1 Tiket = 1x Naik (Tiket tidak bisa dipakai 2x)
+        // 2. Validasi Tiket Dibatalkan (Status -1)
+        if ($tiket->isDibatalkan()) {
+            return response()->json([
+                'success' => false,
+                'code' => 'TICKET_CANCELLED',
+                'message' => 'Tiket ini telah DIBATALKAN (Void) oleh Kasir/Admin dan tidak berlaku untuk perjalanan!',
+                'tiket' => [
+                    'kode_tiket' => $tiket->kode_tiket,
+                    'nama_pembeli' => $tiket->nama_pembeli,
+                    'nama_kapal' => $tiket->kapal ? $tiket->kapal->nama_kapal : '-',
+                    'status' => 'Dibatalkan',
+                ],
+            ], 422);
+        }
+
+        // 3. Validasi 1 Tiket = 1x Naik (Tiket tidak bisa dipakai 2x)
         if ($tiket->isSudahDigunakan()) {
             return response()->json([
                 'success' => false,
@@ -78,7 +94,7 @@ class ScanController extends Controller
             ], 422);
         }
 
-        // 3. Validasi Kapal
+        // 4. Validasi Kapal
         $kapal = $tiket->kapal;
         if (! $kapal) {
             return response()->json([
@@ -88,7 +104,7 @@ class ScanController extends Controller
             ], 422);
         }
 
-        // 4. Validasi Kapal Sedang Berlayar (Sistem tidak bisa scan unit kapal yang sama saat masih berlayar)
+        // 5. Validasi Kapal Sedang Berlayar (Sistem tidak bisa scan unit kapal yang sama saat masih berlayar)
         if ($kapal->isSedangBerlayar()) {
             $waktuMulai = $kapal->waktu_mulai_trip ? $kapal->waktu_mulai_trip->format('H:i') : '-';
             $estimasiSelesai = $kapal->waktu_mulai_trip ? $kapal->waktu_mulai_trip->copy()->addMinutes(30)->format('H:i') : '-';
@@ -107,7 +123,7 @@ class ScanController extends Controller
             ], 422);
         }
 
-        // 5. Validasi Kapal Maintenance
+        // 6. Validasi Kapal Maintenance
         if ($kapal->status === Kapal::STATUS_MAINTENANCE) {
             return response()->json([
                 'success' => false,
@@ -116,7 +132,32 @@ class ScanController extends Controller
             ], 422);
         }
 
-        // 6. Eksekusi Transaksi: Update Tiket -> Digunakan & Kapal -> Sedang Berlayar
+        // Tahap 1: Validasi berhasil, minta konfirmasi operator jika confirm belum true
+        if (! $confirm) {
+            return response()->json([
+                'success' => true,
+                'needs_confirmation' => true,
+                'message' => 'Tiket sudah sesuai, Silahkan naik (Ya/tidak)',
+                'data' => [
+                    'id' => $tiket->id,
+                    'kode_tiket' => $tiket->kode_tiket,
+                    'nama_pembeli' => $tiket->nama_pembeli,
+                    'no_hp' => $tiket->no_hp,
+                    'alamat' => $tiket->alamat,
+                    'tarif' => (float) $tiket->tarif,
+                    'total_bayar' => (float) $tiket->total_bayar,
+                    'is_weekend' => (bool) $tiket->is_weekend,
+                    'tanggal_pemesanan' => $tiket->tanggal_pemesanan->format('d M Y, H:i'),
+                    'kapal' => [
+                        'id' => $kapal->id,
+                        'nama_kapal' => $kapal->nama_kapal,
+                        'kode_kapal' => $kapal->kode_kapal,
+                    ],
+                ],
+            ]);
+        }
+
+        // Tahap 2: Operator konfirmasi "Ya" -> Eksekusi Transaksi
         DB::transaction(function () use ($tiket, $kapal) {
             $now = now();
 
