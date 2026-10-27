@@ -34,6 +34,12 @@
                     </form>
                 @endif
                 @if ($tiket->status !== -1)
+                    <button type="button" onclick="printThisTicketBluetooth()"
+                        class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2.5 rounded-2xl shadow-sm shadow-indigo-200 transition cursor-pointer"
+                        title="Cetak langsung ke Printer Termal Bluetooth">
+                        <i class="fa-brands fa-bluetooth-b"></i>
+                        <span>Cetak Bluetooth</span>
+                    </button>
                     <a href="{{ route('admin.tiket.print', $tiket) }}" target="_blank"
                         class="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold px-4 py-2.5 rounded-2xl transition"
                         title="Buka struk termal di tab baru">
@@ -41,7 +47,7 @@
                         Buka Struk
                     </a>
                     <button type="button" onclick="printThermalTicket()"
-                        class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-2xl shadow-sm shadow-blue-200 transition">
+                        class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-2xl shadow-sm shadow-blue-200 transition cursor-pointer">
                         <i class="fa-solid fa-print"></i>
                         Cetak Tiket (58mm)
                     </button>
@@ -228,6 +234,39 @@
             };
 
             frame.src = '{{ route('admin.tiket.print', $tiket) }}';
+        }
+    </script>
+
+    {{-- Modal Printer Bluetooth & Script --}}
+    @include('admin.tiket.partials.bluetooth-modal')
+    <script src="{{ asset('js/thermal-bluetooth.js') }}"></script>
+    <script>
+        const currentTicketData = {!! json_encode([
+            'kode_tiket' => $tiket->kode_tiket,
+            'waktu' => $tiket->tanggal_pemesanan->format('d/m/Y H:i'),
+            'kasir' => Auth::user()->name,
+            'nama_pembeli' => $tiket->nama_pembeli,
+            'no_hp' => $tiket->no_hp,
+            'alamat' => $tiket->alamat ?? '',
+            'kapal' => $tiket->kapal->nama_kapal,
+            'hari' => $tiket->is_weekend ? 'Weekend' : 'Hari Biasa',
+            'tarif' => number_format($tiket->tarif, 0, ',', '.'),
+            'diskon' => (float) $tiket->diskon > 0 ? number_format($tiket->diskon, 0, ',', '.') : null,
+            'total' => number_format($tiket->total_bayar, 0, ',', '.'),
+            'qr_code' => $tiket->qr_code,
+            'status' => $tiket->status,
+        ]) !!};
+
+        async function printThisTicketBluetooth() {
+            if (!window.ThermalBluetooth) return;
+
+            if (!window.ThermalBluetooth.isConnected()) {
+                openBluetoothModal();
+                window.ThermalBluetooth.showToast('Silakan hubungkan printer Bluetooth terlebih dahulu.', 'info');
+                return;
+            }
+
+            await window.ThermalBluetooth.printTicket(currentTicketData);
         }
     </script>
 </x-app-layout>

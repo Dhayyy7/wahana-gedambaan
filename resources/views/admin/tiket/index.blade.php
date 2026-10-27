@@ -5,11 +5,21 @@
                 <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Pemesanan Tiket</h1>
                 <p class="text-sm text-slate-500 mt-0.5">Riwayat seluruh transaksi tiket wahana.</p>
             </div>
-            <a href="{{ route('admin.tiket.create') }}"
-                class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-2xl shadow-sm shadow-blue-200 transition">
-                <i class="fa-solid fa-plus"></i>
-                Buat Tiket
-            </a>
+            <div class="flex items-center gap-2.5">
+                <button type="button" onclick="openBluetoothModal()"
+                    id="btn-bt-header"
+                    class="inline-flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-sm font-semibold px-4 py-2.5 rounded-2xl shadow-xs transition cursor-pointer">
+                    <span id="bt-status-dot" class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
+                    <i class="fa-brands fa-bluetooth-b text-indigo-500"></i>
+                    <span id="bt-header-text">Printer Bluetooth</span>
+                </button>
+
+                <a href="{{ route('admin.tiket.create') }}"
+                    class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-2xl shadow-sm shadow-blue-200 transition">
+                    <i class="fa-solid fa-plus"></i>
+                    Buat Tiket
+                </a>
+            </div>
         </div>
     </x-slot>
 
@@ -237,9 +247,30 @@
                                         </a>
 
                                         @if ($tiket->status !== -1)
+                                            <button type="button"
+                                                onclick="printSingleTicketBluetooth(this)"
+                                                data-tiket="{{ json_encode([
+                                                    'kode_tiket' => $tiket->kode_tiket,
+                                                    'waktu' => $tiket->tanggal_pemesanan->format('d/m/Y H:i'),
+                                                    'kasir' => Auth::user()->name,
+                                                    'nama_pembeli' => $tiket->nama_pembeli,
+                                                    'no_hp' => $tiket->no_hp,
+                                                    'alamat' => $tiket->alamat ?? '',
+                                                    'kapal' => $tiket->kapal->nama_kapal,
+                                                    'hari' => $tiket->is_weekend ? 'Weekend' : 'Hari Biasa',
+                                                    'tarif' => number_format($tiket->tarif, 0, ',', '.'),
+                                                    'diskon' => (float) $tiket->diskon > 0 ? number_format($tiket->diskon, 0, ',', '.') : null,
+                                                    'total' => number_format($tiket->total_bayar, 0, ',', '.'),
+                                                    'qr_code' => $tiket->qr_code,
+                                                ]) }}"
+                                                class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition cursor-pointer"
+                                                title="Cetak Langsung via Bluetooth">
+                                                <i class="fa-brands fa-bluetooth-b text-sm"></i>
+                                            </button>
+
                                             <a href="{{ route('admin.tiket.print', $tiket) }}" target="_blank"
                                                 class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition"
-                                                title="Cetak Struk Termal (58mm)">
+                                                title="Cetak Struk Browser (58mm)">
                                                 <i class="fa-solid fa-print text-sm"></i>
                                             </a>
                                         @endif
@@ -297,4 +328,8 @@
             @endif
         @endif
     </div>
+
+    {{-- Modal Printer Bluetooth & Script --}}
+    @include('admin.tiket.partials.bluetooth-modal')
+    <script src="{{ asset('js/thermal-bluetooth.js') }}"></script>
 </x-app-layout>
