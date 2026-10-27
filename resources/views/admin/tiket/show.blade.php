@@ -35,7 +35,7 @@
                 @endif
                 @if ($tiket->status !== -1)
                     <button type="button" onclick="printThisTicketBluetooth()"
-                        class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2.5 rounded-2xl shadow-sm shadow-indigo-200 transition cursor-pointer"
+                        class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 rounded-2xl shadow-sm shadow-blue-200 transition cursor-pointer"
                         title="Cetak langsung ke Printer Termal Bluetooth">
                         <i class="fa-brands fa-bluetooth-b"></i>
                         <span>Cetak Bluetooth</span>

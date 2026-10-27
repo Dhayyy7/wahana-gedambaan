@@ -466,7 +466,13 @@
 
             if (btnScan) {
                 btnScan.disabled = this.isConnecting;
-                btnScan.innerText = this.isConnecting ? 'Mencari...' : (isConn ? 'Ganti Printer' : '🔍 Scan & Hubungkan');
+                if (this.isConnecting) {
+                    btnScan.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Mencari Printer...</span>';
+                } else if (isConn) {
+                    btnScan.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i><span>Ganti Printer</span>';
+                } else {
+                    btnScan.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i><span>Scan & Hubungkan Printer</span>';
+                }
             }
         }
 

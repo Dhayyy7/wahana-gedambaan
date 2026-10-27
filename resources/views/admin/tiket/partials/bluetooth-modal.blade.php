@@ -9,7 +9,7 @@
             {{-- Header Modal --}}
             <div class="flex items-start justify-between pb-4 border-b border-slate-100">
                 <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 rounded-2xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center text-lg shrink-0">
+                    <div class="w-11 h-11 rounded-2xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center text-lg shrink-0">
                         <i class="fa-brands fa-bluetooth-b"></i>
                     </div>
                     <div>
@@ -17,7 +17,7 @@
                         <p class="text-xs text-slate-500">Koneksi langsung printer termal 58mm/80mm</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeBluetoothModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-xl hover:bg-slate-50 transition">
+                <button type="button" onclick="closeBluetoothModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-xl hover:bg-slate-50 transition cursor-pointer">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
@@ -50,7 +50,7 @@
                     <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Status Koneksi</label>
                     <div id="bt-modal-status">
                         <div class="flex items-center gap-2.5 text-slate-600 bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl text-xs">
-                            <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-slate-400 shrink-0" style="display: inline-block;"></span>
                             <span>Belum terhubung ke printer Bluetooth.</span>
                         </div>
                     </div>
@@ -59,7 +59,8 @@
                 {{-- Action Buttons --}}
                 <div class="space-y-2 pt-2">
                     <button type="button" id="bt-btn-scan" onclick="handleScanBluetooth()"
-                        class="w-full py-3 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-md shadow-indigo-200 transition flex items-center justify-center gap-2 cursor-pointer">
+                        style="background-color: #2563eb; color: #ffffff;"
+                        class="w-full py-3 px-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md shadow-blue-200 transition flex items-center justify-center gap-2 cursor-pointer">
                         <i class="fa-solid fa-magnifying-glass"></i>
                         <span>Scan & Hubungkan Printer</span>
                     </button>
@@ -82,7 +83,7 @@
                 {{-- Petunjuk Singkat --}}
                 <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 text-xs text-slate-500 space-y-1.5">
                     <p class="font-bold text-slate-700 flex items-center gap-1.5">
-                        <i class="fa-solid fa-circle-question text-indigo-500"></i>
+                        <i class="fa-solid fa-circle-question text-blue-500"></i>
                         Panduan Cepat:
                     </p>
                     <ol class="list-decimal list-inside space-y-1 text-slate-600 leading-relaxed pl-1">

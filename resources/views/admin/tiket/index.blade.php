@@ -10,7 +10,7 @@
                     id="btn-bt-header"
                     class="inline-flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-sm font-semibold px-4 py-2.5 rounded-2xl shadow-xs transition cursor-pointer">
                     <span id="bt-status-dot" class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
-                    <i class="fa-brands fa-bluetooth-b text-indigo-500"></i>
+                    <i class="fa-brands fa-bluetooth-b text-blue-600"></i>
                     <span id="bt-header-text">Printer Bluetooth</span>
                 </button>
 
@@ -263,7 +263,7 @@
                                                     'total' => number_format($tiket->total_bayar, 0, ',', '.'),
                                                     'qr_code' => $tiket->qr_code,
                                                 ]) }}"
-                                                class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition cursor-pointer"
+                                                class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition cursor-pointer"
                                                 title="Cetak Langsung via Bluetooth">
                                                 <i class="fa-brands fa-bluetooth-b text-sm"></i>
                                             </button>
