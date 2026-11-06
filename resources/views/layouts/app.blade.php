@@ -57,7 +57,7 @@
                     <!-- Brand Header / Logo & Title -->
                     <div class="h-20 flex items-center justify-between px-5 border-b border-slate-50">
                         <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5 group py-1 min-w-0">
-                            <img src="{{ asset('images/asset_login/logo.png') }}" alt="SpeedBoat Gedambaan"
+                            <img src="{{ asset('images/asset_login/logo.png') }}" alt="Wahana Gedambaan"
                                 class="h-11 w-auto shrink-0 object-contain transition group-hover:scale-105 duration-200" />
                             <div class="flex flex-col min-w-0">
                                 <span class="font-extrabold text-sm text-[#0F3B73] tracking-tight leading-snug">
@@ -302,12 +302,14 @@
                 {{-- Buttons --}}
                 <div class="flex items-center gap-3 mt-6">
                     <button type="button" onclick="window.closeGlobalConfirmModal()" id="global-modal-cancel-btn"
-                        class="w-1/2 py-2.5 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition">
+                        style="background-color: #f1f5f9; color: #334155;"
+                        class="w-1/2 py-2.5 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition cursor-pointer">
                         Batal
                     </button>
                     <button type="button" id="global-modal-confirm-btn"
-                        class="w-1/2 py-2.5 px-4 rounded-2xl font-bold text-sm shadow-md transition flex items-center justify-center gap-2">
-                        <span>Konfirmasi</span>
+                        style="background-color: #d97706; color: #ffffff;"
+                        class="w-1/2 py-2.5 px-4 rounded-2xl bg-amber-600 text-white font-bold text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
+                        <span style="color: #ffffff;">Konfirmasi</span>
                     </button>
                 </div>
             </div>
@@ -383,16 +385,31 @@
             const type = options.type || 'warning';
             if (type === 'danger') {
                 iconBox.className = 'w-16 h-16 rounded-3xl bg-rose-50 text-rose-600 border border-rose-100 flex items-center justify-center text-3xl mx-auto mb-4 shadow-2xs';
+                iconBox.style.backgroundColor = '#fff1f2';
+                iconBox.style.color = '#e11d48';
+                iconBox.style.borderColor = '#ffe4e6';
                 icon.className = 'fa-solid fa-triangle-exclamation';
                 confirmBtn.className = 'w-1/2 py-2.5 px-4 rounded-2xl bg-rose-600 hover:bg-rose-700 active:scale-98 text-white font-bold text-sm shadow-md shadow-rose-200 transition flex items-center justify-center gap-2 cursor-pointer';
+                confirmBtn.style.backgroundColor = '#e11d48';
+                confirmBtn.style.color = '#ffffff';
             } else if (type === 'warning') {
                 iconBox.className = 'w-16 h-16 rounded-3xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center text-3xl mx-auto mb-4 shadow-2xs';
+                iconBox.style.backgroundColor = '#fffbeb';
+                iconBox.style.color = '#d97706';
+                iconBox.style.borderColor = '#fef3c7';
                 icon.className = 'fa-solid fa-circle-exclamation';
                 confirmBtn.className = 'w-1/2 py-2.5 px-4 rounded-2xl bg-amber-600 hover:bg-amber-700 active:scale-98 text-white font-bold text-sm shadow-md shadow-amber-200 transition flex items-center justify-center gap-2 cursor-pointer';
+                confirmBtn.style.backgroundColor = '#d97706';
+                confirmBtn.style.color = '#ffffff';
             } else {
                 iconBox.className = 'w-16 h-16 rounded-3xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center text-3xl mx-auto mb-4 shadow-2xs';
+                iconBox.style.backgroundColor = '#eff6ff';
+                iconBox.style.color = '#2563eb';
+                iconBox.style.borderColor = '#dbeafe';
                 icon.className = 'fa-solid fa-circle-question';
                 confirmBtn.className = 'w-1/2 py-2.5 px-4 rounded-2xl bg-blue-600 hover:bg-blue-700 active:scale-98 text-white font-bold text-sm shadow-md shadow-blue-200 transition flex items-center justify-center gap-2 cursor-pointer';
+                confirmBtn.style.backgroundColor = '#2563eb';
+                confirmBtn.style.color = '#ffffff';
             }
 
             globalConfirmCallback = options.onConfirm;

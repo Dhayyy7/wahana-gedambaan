@@ -8,7 +8,7 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('images/asset_login/logo.png') }}">
 
-    <title>Login - {{ config('app.name', 'Speedboat Gedambaan') }}</title>
+    <title>Login - {{ config('app.name', 'Wahana Gedambaan') }}</title>
 
     <!-- Google Fonts: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -47,11 +47,11 @@
 
             <!-- Left Column: Welcome Greeting & Official Logo -->
             <div class="lg:col-span-7 flex flex-col justify-center text-left py-4">
-                <!-- Speedboat Gedambaan Logo -->
+                <!-- Wahana Gedambaan Logo -->
                 <div class="mb-4">
                     <img
                         src="{{ asset('images/asset_login/logo.png') }}"
-                        alt="Logo Speedboat Gedambaan"
+                        alt="Logo Wahana Gedambaan"
                         class="h-20 sm:h-24 md:h-28 w-auto object-contain drop-shadow-md hover:scale-105 transition-transform duration-200"
                     />
                 </div>
@@ -75,7 +75,7 @@
                     <div class="mb-6">
                         <!-- Tampilan Logo saat di layar HP (Mobile Only) -->
                         <div class="flex lg:hidden mb-4 justify-center">
-                            <img src="{{ asset('images/asset_login/logo.png') }}" alt="Speedboat Gedambaan" class="h-14 w-auto object-contain">
+                            <img src="{{ asset('images/asset_login/logo.png') }}" alt="Wahana Gedambaan" class="h-14 w-auto object-contain">
                         </div>
 
                         <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">

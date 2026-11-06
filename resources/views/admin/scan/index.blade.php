@@ -302,7 +302,8 @@
                         <i class="fa-solid fa-xmark mr-1"></i> Tidak
                     </button>
                     <button type="button" id="btn-submit-boarding" onclick="confirmBoarding()"
-                        class="w-2/3 py-3 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-bold text-sm shadow-md shadow-emerald-200 transition flex items-center justify-center gap-2">
+                        style="background-color: #059669; color: #ffffff;"
+                        class="w-2/3 py-3 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-bold text-sm shadow-md shadow-emerald-200 transition flex items-center justify-center gap-2 cursor-pointer">
                         <i class="fa-solid fa-circle-check text-base"></i>
                         <span>Ya, Silahkan Naik</span>
                     </button>
@@ -342,7 +343,8 @@
                         Batal
                     </button>
                     <button type="button" id="btn-submit-selesai-trip" onclick="submitSelesaiTrip()"
-                        class="w-1/2 py-2.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-bold text-sm shadow-md shadow-emerald-200 transition flex items-center justify-center gap-2">
+                        style="background-color: #059669; color: #ffffff;"
+                        class="w-1/2 py-2.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-bold text-sm shadow-md shadow-emerald-200 transition flex items-center justify-center gap-2 cursor-pointer">
                         <i class="fa-solid fa-check"></i>
                         <span>Ya, Selesaikan</span>
                     </button>
@@ -362,7 +364,8 @@
                 <h4 id="notif-title" class="text-lg font-extrabold text-slate-800"></h4>
                 <p id="notif-message" class="text-xs text-slate-500 mt-1.5 leading-relaxed"></p>
                 <button type="button" onclick="closeNotificationModal()"
-                    class="mt-5 w-full py-2.5 px-4 rounded-2xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs transition">
+                    style="background-color: #1e293b; color: #ffffff;"
+                    class="mt-5 w-full py-2.5 px-4 rounded-2xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs transition cursor-pointer">
                     Tutup
                 </button>
             </div>
