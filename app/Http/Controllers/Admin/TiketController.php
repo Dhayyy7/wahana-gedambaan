@@ -19,6 +19,8 @@ class TiketController extends Controller
      */
     public function index(Request $request): View
     {
+        Tiket::syncExpiredTickets();
+
         $search = $request->input('search');
         $status = $request->input('status', 'all');
 
@@ -105,6 +107,10 @@ class TiketController extends Controller
      */
     public function show(Tiket $tiket): View
     {
+        if ($tiket->isPending() && $tiket->isExpired()) {
+            $tiket->update(['status' => Tiket::STATUS_SELESAI]);
+        }
+
         $tiket->load('kapal');
 
         return view('admin.tiket.show', compact('tiket'));
@@ -115,6 +121,10 @@ class TiketController extends Controller
      */
     public function print(Tiket $tiket): View
     {
+        if ($tiket->isPending() && $tiket->isExpired()) {
+            $tiket->update(['status' => Tiket::STATUS_SELESAI]);
+        }
+
         $tiket->load('kapal');
 
         return view('admin.tiket.print', compact('tiket'));
@@ -141,8 +151,16 @@ class TiketController extends Controller
      */
     public function cancel(Tiket $tiket): RedirectResponse
     {
+        if ($tiket->isPending() && $tiket->isExpired()) {
+            $tiket->update(['status' => Tiket::STATUS_SELESAI]);
+        }
+
         if ($tiket->isSudahDigunakan()) {
-            return back()->withErrors(['error' => 'Tiket yang sudah digunakan tidak dapat dibatalkan.']);
+            $pesan = $tiket->isAutoSelesai()
+                ? 'Tiket telah melewati masa berlaku 12 jam (otomatis selesai) dan tidak dapat dibatalkan.'
+                : 'Tiket yang sudah digunakan tidak dapat dibatalkan.';
+
+            return back()->withErrors(['error' => $pesan]);
         }
 
         if ($tiket->isDibatalkan()) {
@@ -168,6 +186,10 @@ class TiketController extends Controller
 
         if (! $user->isSuperadmin()) {
             return back()->withErrors(['error' => 'Kasir tidak diizinkan menghapus transaksi. Gunakan aksi Batalkan Pesanan jika terjadi salah input.']);
+        }
+
+        if ($tiket->isPending() && $tiket->isExpired()) {
+            $tiket->update(['status' => Tiket::STATUS_SELESAI]);
         }
 
         if ($tiket->isSudahDigunakan()) {

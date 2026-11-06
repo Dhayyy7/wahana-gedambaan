@@ -17,6 +17,8 @@ class ScanController extends Controller
      */
     public function index(): View
     {
+        Tiket::syncExpiredTickets();
+
         // Ambil daftar kapal yang sedang berlayar
         $kapalBerlayar = Kapal::where('status', Kapal::STATUS_SEDANG_BERLAYAR)
             ->orderBy('waktu_mulai_trip', 'desc')
@@ -79,8 +81,31 @@ class ScanController extends Controller
             ], 422);
         }
 
-        // 3. Validasi 1 Tiket = 1x Naik (Tiket tidak bisa dipakai 2x)
+        // 3. Sinkronisasi jika tiket pending sudah melewati masa berlaku 12 jam
+        if ($tiket->isPending() && $tiket->isExpired()) {
+            $tiket->update([
+                'status' => Tiket::STATUS_SELESAI,
+            ]);
+        }
+
+        // 4. Validasi 1 Tiket = 1x Naik (Tiket tidak bisa dipakai 2x atau sudah lewat 12 jam)
         if ($tiket->isSudahDigunakan()) {
+            if ($tiket->isAutoSelesai()) {
+                $batasWaktu = $tiket->waktu_kadaluarsa ? $tiket->waktu_kadaluarsa->format('d/m/Y H:i') : '-';
+
+                return response()->json([
+                    'success' => false,
+                    'code' => 'ALREADY_USED',
+                    'message' => "Masa berlaku tiket (12 jam) telah berakhir pada {$batasWaktu} dan otomatis tercatat Sudah Digunakan. Tiket tidak dapat digunakan lagi!",
+                    'tiket' => [
+                        'kode_tiket' => $tiket->kode_tiket,
+                        'nama_pembeli' => $tiket->nama_pembeli,
+                        'nama_kapal' => $tiket->kapal ? $tiket->kapal->nama_kapal : '-',
+                        'tanggal_scan' => 'Otomatis 12 Jam (Manual)',
+                    ],
+                ], 422);
+            }
+
             return response()->json([
                 'success' => false,
                 'code' => 'ALREADY_USED',

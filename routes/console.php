@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Kapal;
+use App\Models\Tiket;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
@@ -47,3 +48,24 @@ Schedule::call(function () {
         Log::info("Cron Job: {$updated} kapal selesai berlayar (30 menit) dan otomatis berstatus Tersedia.");
     }
 })->everyMinute()->name('reset-kapal-trip');
+
+/**
+ * Command manual untuk menyelesaikan otomatis tiket Pending yang sudah lewat 12 jam.
+ */
+Artisan::command('tiket:auto-complete', function () {
+    $updated = Tiket::syncExpiredTickets();
+
+    $this->info("Pengecekan masa berlaku tiket selesai. Total {$updated} tiket lewat 12 jam diubah menjadi Sudah Digunakan.");
+})->purpose('Ubah otomatis tiket berstatus Belum Digunakan yang sudah lewat 12 jam menjadi Sudah Digunakan');
+
+/**
+ * Cron Job / Scheduler: Dijalankan setiap 5 menit untuk mengubah tiket Pending
+ * yang sudah melewati 12 jam menjadi Sudah Digunakan (Selesai).
+ */
+Schedule::call(function () {
+    $updated = Tiket::syncExpiredTickets();
+
+    if ($updated > 0) {
+        Log::info("Cron Job: {$updated} tiket melewati 12 jam dan otomatis berstatus Sudah Digunakan.");
+    }
+})->everyFiveMinutes()->name('auto-complete-expired-tiket');

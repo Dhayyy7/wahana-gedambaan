@@ -176,7 +176,7 @@
                         </span>
                         <span class="inline-flex items-center gap-1 text-[11px] font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full">
                             <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
-                            {{ $kapalBerlayar }} Berlayar
+                            {{ $kapalBerlayar }} Digunakan
                         </span>
                     </div>
                 </div>
@@ -399,7 +399,7 @@
                         </div>
                     </div>
                     <div class="flex items-center justify-between mt-4 pt-2.5 border-t border-slate-50 text-xs">
-                        <span class="text-slate-500 font-medium">Sedang berlayar</span>
+                        <span class="text-slate-500 font-medium">Sedang digunakan</span>
                         <span class="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
                             <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
                             Live
@@ -598,7 +598,7 @@
                                             @elseif ($kapal->status === \App\Models\Kapal::STATUS_SEDANG_BERLAYAR)
                                                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
                                                     <span class="w-1 h-1 rounded-full bg-sky-500 animate-pulse"></span>
-                                                    Berlayar
+                                                    Digunakan
                                                 </span>
                                             @else
                                                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
@@ -850,7 +850,7 @@
                                             @elseif ($kapal->status === \App\Models\Kapal::STATUS_SEDANG_BERLAYAR)
                                                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
                                                     <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
-                                                    Berlayar
+                                                    Digunakan
                                                 </span>
                                             @else
                                                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">

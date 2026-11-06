@@ -17,6 +17,8 @@ class LaporanController extends Controller
      */
     public function index(Request $request): View
     {
+        Tiket::syncExpiredTickets();
+
         $bulan = (int) $request->input('bulan', now()->month);
         $tahun = (int) $request->input('tahun', now()->year);
         $kapalId = $request->input('kapal_id', 'all');
@@ -80,6 +82,8 @@ class LaporanController extends Controller
      */
     public function exportExcel(Request $request): Response
     {
+        Tiket::syncExpiredTickets();
+
         $bulan = (int) $request->input('bulan', now()->month);
         $tahun = (int) $request->input('tahun', now()->year);
         $kapalId = $request->input('kapal_id', 'all');
@@ -160,6 +164,8 @@ class LaporanController extends Controller
      */
     public function exportCsv(Request $request): StreamedResponse
     {
+        Tiket::syncExpiredTickets();
+
         $bulan = (int) $request->input('bulan', now()->month);
         $tahun = (int) $request->input('tahun', now()->year);
         $kapalId = $request->input('kapal_id', 'all');
@@ -241,7 +247,9 @@ class LaporanController extends Controller
                         (int) $tiket->diskon,
                         (int) $tiket->total_bayar,
                         $statusLabel,
-                        $tiket->tanggal_scan ? $tiket->tanggal_scan->format('d/m/Y H:i') : '-',
+                        $tiket->tanggal_scan
+                            ? $tiket->tanggal_scan->format('d/m/Y H:i')
+                            : ($tiket->isAutoSelesai() ? 'Auto 12 Jam (Manual)' : '-'),
                     ], ';');
                 }
             });

@@ -306,7 +306,7 @@
      <Cell ss:StyleID="{{ $isBatal ? 'BadgeBatal' : ($isSelesai ? 'BadgeSelesai' : 'BadgePending') }}">
       <Data ss:Type="String">{{ $isBatal ? 'Dibatalkan' : ($isSelesai ? 'Sudah Digunakan' : 'Belum Digunakan') }}</Data>
      </Cell>
-     <Cell ss:StyleID="CellCenter"><Data ss:Type="String">{{ $tiket->tanggal_scan ? $tiket->tanggal_scan->format('d/m/Y H:i') : '-' }}</Data></Cell>
+     <Cell ss:StyleID="CellCenter"><Data ss:Type="String">{{ $tiket->tanggal_scan ? $tiket->tanggal_scan->format('d/m/Y H:i') : ($tiket->isAutoSelesai() ? 'Auto 12 Jam (Manual)' : '-') }}</Data></Cell>
     </Row>
    @empty
     <Row ss:Height="24">

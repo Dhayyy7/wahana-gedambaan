@@ -234,7 +234,7 @@
         <div class="text-center">
             <img src="{{ asset('images/asset_login/logo.png') }}" alt="Logo" class="logo">
             <div class="title">Wahana Gedambaan</div>
-            <div class="subtitle">Speed Boat Adventure</div>
+            <div class="subtitle">Wisata Pantai Gedambaan</div>
         </div>
 
         <div class="divider-double"></div>
@@ -332,8 +332,8 @@
 
         <!-- Footer -->
         <div class="footer-note">
-            Tiket hanya berlaku 1x perjalanan.<br>
-            Tunjukkan QR Code ke petugas wahana.
+            Berlaku 12 jam (1x perjalanan).<br>
+            Tunjukkan tiket/QR ke petugas wahana.
         </div>
         <div class="footer-thanks">
             *** TERIMA KASIH ***

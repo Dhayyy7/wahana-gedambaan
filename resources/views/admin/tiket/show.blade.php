@@ -97,7 +97,7 @@
                             class="h-10 w-auto object-contain brightness-0 invert" />
                         <div>
                             <p class="font-extrabold text-lg leading-tight">Wahana Gedambaan</p>
-                            <p class="{{ $tiket->status === -1 ? 'text-slate-300' : 'text-blue-200' }} text-xs">Speed Boat Adventure</p>
+                            <p class="{{ $tiket->status === -1 ? 'text-slate-300' : 'text-blue-200' }} text-xs">Wisata Pantai Gedambaan</p>
                         </div>
                     </div>
                     <div class="text-right">
@@ -129,7 +129,14 @@
                     <div class="flex justify-center">
                         <span class="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold px-3 py-1.5 rounded-full">
                             <i class="fa-solid fa-circle-check text-emerald-500"></i>
-                            Sudah Digunakan — {{ $tiket->tanggal_scan?->format('d M Y, H:i') }}
+                            Sudah Digunakan — {{ $tiket->tanggal_scan ? $tiket->tanggal_scan->format('d M Y, H:i') : 'Otomatis 12 Jam (Manual)' }}
+                        </span>
+                    </div>
+                @else
+                    <div class="flex justify-center">
+                        <span class="inline-flex items-center gap-2 bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold px-3 py-1.5 rounded-full">
+                            <i class="fa-regular fa-clock text-amber-500"></i>
+                            Belum Digunakan — Berlaku 12 Jam (s/d {{ $tiket->waktu_kadaluarsa?->format('d M Y, H:i') }})
                         </span>
                     </div>
                 @endif

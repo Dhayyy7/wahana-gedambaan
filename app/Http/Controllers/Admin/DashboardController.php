@@ -16,6 +16,8 @@ class DashboardController extends Controller
      */
     public function index(): View
     {
+        Tiket::syncExpiredTickets();
+
         /** @var User $user */
         $user = Auth::user();
 

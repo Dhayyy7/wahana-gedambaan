@@ -70,7 +70,7 @@ class Kapal extends Model
     {
         return match ($this->status) {
             self::STATUS_TERSEDIA => 'Tersedia',
-            self::STATUS_SEDANG_BERLAYAR => 'Sedang Berlayar',
+            self::STATUS_SEDANG_BERLAYAR => 'Sedang Digunakan',
             self::STATUS_MAINTENANCE => 'Maintenance',
             default => 'Tidak Diketahui',
         };

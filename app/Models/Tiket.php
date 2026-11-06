@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 class Tiket extends Model
 {
@@ -32,6 +33,8 @@ class Tiket extends Model
     public const STATUS_PENDING = 0;
 
     public const STATUS_SELESAI = 1;
+
+    public const EXPIRE_HOURS = 12;
 
     /**
      * @return array<string, string>
@@ -82,11 +85,50 @@ class Tiket extends Model
     }
 
     /**
+     * Apakah tiket sudah melewati batas masa berlaku 12 jam sejak waktu pemesanan?
+     */
+    public function isExpired(): bool
+    {
+        return $this->tanggal_pemesanan !== null
+            && $this->tanggal_pemesanan->lte(now()->subHours(self::EXPIRE_HOURS));
+    }
+
+    /**
+     * Apakah tiket diselesaikan secara otomatis setelah 12 jam (disobek manual tanpa scan QR)?
+     */
+    public function isAutoSelesai(): bool
+    {
+        return $this->status === self::STATUS_SELESAI && $this->tanggal_scan === null;
+    }
+
+    /**
+     * Batas waktu berlaku tiket (12 jam sejak tanggal_pemesanan).
+     */
+    public function getWaktuKadaluarsaAttribute(): ?Carbon
+    {
+        return $this->tanggal_pemesanan?->copy()->addHours(self::EXPIRE_HOURS);
+    }
+
+    /**
      * Apakah tiket masih bisa dibatalkan oleh kasir/admin?
      */
     public function canBeCancelled(): bool
     {
-        return $this->status === self::STATUS_PENDING;
+        return $this->status === self::STATUS_PENDING && ! $this->isExpired();
+    }
+
+    /**
+     * Otomatis ubah tiket berstatus Pending yang sudah melewati 12 jam
+     * sejak tanggal_pemesanan menjadi Selesai (Sudah Digunakan) tanpa mengisi tanggal_scan,
+     * untuk mengakomodasi tiket yang disobek manual oleh operator tanpa scan QR.
+     */
+    public static function syncExpiredTickets(): int
+    {
+        return static::where('status', self::STATUS_PENDING)
+            ->where('tanggal_pemesanan', '<=', now()->subHours(self::EXPIRE_HOURS))
+            ->update([
+                'status' => self::STATUS_SELESAI,
+            ]);
     }
 
     /**

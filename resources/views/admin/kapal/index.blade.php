@@ -139,7 +139,7 @@
                                         };
                                         $statusLabel = match($kapal->status) {
                                             1 => 'Tersedia',
-                                            2 => 'Berlayar',
+                                            2 => 'Digunakan',
                                             3 => 'Maintenance',
                                             default => 'Tidak Diketahui',
                                         };

@@ -275,7 +275,8 @@
                                 </td>
                                 <td class="px-5 py-3.5 text-center">
                                     @if ($tiket->status === 1)
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                            title="{{ $tiket->tanggal_scan ? 'Di-scan QR: ' . $tiket->tanggal_scan->format('d/m/Y H:i') : 'Selesai Otomatis 12 Jam (Manual)' }}">
                                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                                             Sudah Digunakan
                                         </span>

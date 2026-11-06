@@ -275,7 +275,7 @@
             appendStr("WAHANA GEDAMBAAN\n");
             appendBytes([0x1D, 0x21, 0x00]); // Normal size
             appendBytes([0x1B, 0x45, 0x00]); // Bold OFF
-            appendStr("Speed Boat Adventure\n");
+            appendStr("Wisata Pantai Gedambaan\n");
             appendStr("================================\n");
 
             // Status Batal / Void
@@ -339,8 +339,8 @@
 
             // 7. Footer
             appendBytes([0x1B, 0x61, 0x01]); // Align Center
-            appendStr("Tiket hanya berlaku 1x perjalanan.\n");
-            appendStr("Tunjukkan QR ke petugas wahana.\n");
+            appendStr("Berlaku 12 jam (1x perjalanan).\n");
+            appendStr("Tunjukkan ke petugas wahana.\n");
             appendBytes([0x1B, 0x45, 0x01]);
             appendStr("*** TERIMA KASIH ***\n");
             appendBytes([0x1B, 0x45, 0x00]);
