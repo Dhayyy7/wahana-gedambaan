@@ -332,5 +332,5 @@
 
     {{-- Modal Printer Bluetooth & Script --}}
     @include('admin.tiket.partials.bluetooth-modal')
-    <script src="{{ asset('js/thermal-bluetooth.js') }}"></script>
+    <script src="{{ asset('js/thermal-bluetooth.js') }}?v={{ @filemtime(public_path('js/thermal-bluetooth.js')) ?: 2 }}"></script>
 </x-app-layout>

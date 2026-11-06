@@ -93,11 +93,13 @@
             <div class="bg-gradient-to-r {{ $tiket->status === -1 ? 'from-slate-600 to-slate-700' : 'from-blue-600 to-blue-700' }} p-6 text-white">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <img src="{{ asset('images/asset_login/logo.png') }}" alt="Logo"
-                            class="h-10 w-auto object-contain brightness-0 invert" />
+                        <div class="w-12 h-5 overflow-hidden shrink-0">
+                            <img src="{{ asset('images/asset_login/logo.png') }}" alt="Logo"
+                                class="w-12 h-auto object-contain brightness-0 invert" />
+                        </div>
                         <div>
                             <p class="font-extrabold text-lg leading-tight">Wahana Gedambaan</p>
-                            <p class="{{ $tiket->status === -1 ? 'text-slate-300' : 'text-blue-200' }} text-xs">Wisata Pantai Gedambaan</p>
+                            <p class="{{ $tiket->status === -1 ? 'text-slate-300' : 'text-blue-200' }} text-xs">Watersport & Adventure</p>
                         </div>
                     </div>
                     <div class="text-right">
@@ -246,7 +248,7 @@
 
     {{-- Modal Printer Bluetooth & Script --}}
     @include('admin.tiket.partials.bluetooth-modal')
-    <script src="{{ asset('js/thermal-bluetooth.js') }}"></script>
+    <script src="{{ asset('js/thermal-bluetooth.js') }}?v={{ @filemtime(public_path('js/thermal-bluetooth.js')) ?: 2 }}"></script>
     <script>
         const currentTicketData = {!! json_encode([
             'kode_tiket' => $tiket->kode_tiket,

@@ -52,10 +52,17 @@
             font-weight: bold;
         }
 
-        .logo {
-            max-height: 34px;
-            width: auto;
+        .logo-crop {
+            width: 58px;
+            height: 23px;
             margin: 0 auto 3px;
+            overflow: hidden;
+            display: block;
+        }
+
+        .logo {
+            width: 58px;
+            height: auto;
             display: block;
             filter: grayscale(100%) contrast(150%);
         }
@@ -232,7 +239,9 @@
     <div class="receipt-container">
         <!-- Header -->
         <div class="text-center">
-            <img src="{{ asset('images/asset_login/logo.png') }}" alt="Logo" class="logo">
+            <div class="logo-crop">
+                <img src="{{ asset('images/asset_login/logo.png') }}" alt="Logo" class="logo">
+            </div>
             <div class="title">Wahana Gedambaan</div>
             <div class="subtitle">Watersport & Adventure</div>
         </div>

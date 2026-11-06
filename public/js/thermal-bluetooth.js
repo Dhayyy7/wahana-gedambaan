@@ -275,7 +275,7 @@
             appendStr("WAHANA GEDAMBAAN\n");
             appendBytes([0x1D, 0x21, 0x00]); // Normal size
             appendBytes([0x1B, 0x45, 0x00]); // Bold OFF
-            appendStr("Wisata Pantai Gedambaan\n");
+            appendStr("Watersport & Adventure\n");
             appendStr("================================\n");
 
             // Status Batal / Void
