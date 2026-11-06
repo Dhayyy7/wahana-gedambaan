@@ -234,7 +234,7 @@
         <div class="text-center">
             <img src="{{ asset('images/asset_login/logo.png') }}" alt="Logo" class="logo">
             <div class="title">Wahana Gedambaan</div>
-            <div class="subtitle">Wisata Pantai Gedambaan</div>
+            <div class="subtitle">Watersport & Adventure</div>
         </div>
 
         <div class="divider-double"></div>
