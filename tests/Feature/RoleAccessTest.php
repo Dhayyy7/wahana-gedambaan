@@ -67,7 +67,7 @@ class RoleAccessTest extends TestCase
 
         // Superadmin melihat semua menu di layout
         $respSuperadmin = $this->actingAs($superadmin)->get(route('admin.dashboard'));
-        $respSuperadmin->assertSee('Kapal');
+        $respSuperadmin->assertSee('Wahana');
         $respSuperadmin->assertSee('Pemesanan');
         $respSuperadmin->assertSee('Scan Tiket');
         $respSuperadmin->assertSee('Users');

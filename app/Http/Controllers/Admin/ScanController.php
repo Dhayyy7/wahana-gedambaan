@@ -94,17 +94,17 @@ class ScanController extends Controller
             ], 422);
         }
 
-        // 4. Validasi Kapal
+        // 4. Validasi Wahana
         $kapal = $tiket->kapal;
         if (! $kapal) {
             return response()->json([
                 'success' => false,
                 'code' => 'KAPAL_NOT_FOUND',
-                'message' => 'Data kapal untuk tiket ini tidak ditemukan dalam database.',
+                'message' => 'Data wahana untuk tiket ini tidak ditemukan dalam database.',
             ], 422);
         }
 
-        // 5. Validasi Kapal Sedang Berlayar (Sistem tidak bisa scan unit kapal yang sama saat masih berlayar)
+        // 5. Validasi Wahana Sedang Digunakan (Sistem tidak bisa scan unit wahana yang sama saat masih digunakan)
         if ($kapal->isSedangBerlayar()) {
             $waktuMulai = $kapal->waktu_mulai_trip ? $kapal->waktu_mulai_trip->format('H:i') : '-';
             $estimasiSelesai = $kapal->waktu_mulai_trip ? $kapal->waktu_mulai_trip->copy()->addMinutes(30)->format('H:i') : '-';
@@ -112,7 +112,7 @@ class ScanController extends Controller
             return response()->json([
                 'success' => false,
                 'code' => 'KAPAL_BUSY',
-                'message' => "Kapal {$kapal->nama_kapal} ({$kapal->kode_kapal}) saat ini sedang dipakai berlayar sejak pukul {$waktuMulai} WIB (estimasi trip selesai {$estimasiSelesai} WIB). Harap tunggu trip selesai sebelum scan tiket berikutnya untuk kapal ini!",
+                'message' => "Wahana {$kapal->nama_kapal} ({$kapal->kode_kapal}) saat ini sedang digunakan sejak pukul {$waktuMulai} WIB (estimasi selesai {$estimasiSelesai} WIB). Harap tunggu sesi selesai sebelum scan tiket berikutnya untuk wahana ini!",
                 'kapal' => [
                     'id' => $kapal->id,
                     'nama_kapal' => $kapal->nama_kapal,
@@ -123,12 +123,12 @@ class ScanController extends Controller
             ], 422);
         }
 
-        // 6. Validasi Kapal Maintenance
+        // 6. Validasi Wahana Maintenance
         if ($kapal->status === Kapal::STATUS_MAINTENANCE) {
             return response()->json([
                 'success' => false,
                 'code' => 'KAPAL_MAINTENANCE',
-                'message' => "Kapal {$kapal->nama_kapal} sedang dalam masa perbaikan (Maintenance) dan belum siap berlayar.",
+                'message' => "Wahana {$kapal->nama_kapal} sedang dalam masa perbaikan (Maintenance) dan belum siap digunakan.",
             ], 422);
         }
 
@@ -198,7 +198,7 @@ class ScanController extends Controller
         if (! $kapal->isSedangBerlayar()) {
             return response()->json([
                 'success' => false,
-                'message' => "Kapal {$kapal->nama_kapal} tidak sedang dalam status berlayar.",
+                'message' => "Wahana {$kapal->nama_kapal} tidak sedang dalam status digunakan.",
             ], 422);
         }
 
@@ -209,7 +209,7 @@ class ScanController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => "Trip kapal {$kapal->nama_kapal} ({$kapal->kode_kapal}) telah diselesaikan. Kapal kini berstatus Tersedia.",
+            'message' => "Sesi wahana {$kapal->nama_kapal} ({$kapal->kode_kapal}) telah diselesaikan. Wahana kini berstatus Tersedia.",
         ]);
     }
 }

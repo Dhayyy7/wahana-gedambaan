@@ -113,7 +113,7 @@
                     <i class="fa-solid fa-magnifying-glass text-sm"></i>
                 </div>
                 <input type="text" name="search" value="{{ $search ?? '' }}"
-                    placeholder="Cari kode tiket, nama pembeli, no HP, atau nama kapal..."
+                    placeholder="Cari kode tiket, nama pembeli, no HP, atau nama wahana..."
                     class="w-full pl-10 pr-4 py-2.5 bg-slate-50 hover:bg-slate-100/80 focus:bg-white text-xs sm:text-sm text-slate-700 placeholder-slate-400 rounded-2xl border border-slate-200/80 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition outline-none" />
             </div>
 
@@ -186,7 +186,7 @@
                         <tr class="border-b border-slate-100 bg-slate-50/70">
                             <th class="px-5 py-3.5 text-left font-semibold text-slate-500 text-xs uppercase tracking-wider">Kode Tiket</th>
                             <th class="px-5 py-3.5 text-left font-semibold text-slate-500 text-xs uppercase tracking-wider">Pembeli</th>
-                            <th class="px-5 py-3.5 text-left font-semibold text-slate-500 text-xs uppercase tracking-wider hidden md:table-cell">Kapal</th>
+                            <th class="px-5 py-3.5 text-left font-semibold text-slate-500 text-xs uppercase tracking-wider hidden md:table-cell">Wahana</th>
                             <th class="px-5 py-3.5 text-right font-semibold text-slate-500 text-xs uppercase tracking-wider hidden sm:table-cell">Total Bayar</th>
                             <th class="px-5 py-3.5 text-center font-semibold text-slate-500 text-xs uppercase tracking-wider">Status</th>
                             <th class="px-5 py-3.5 text-left font-semibold text-slate-500 text-xs uppercase tracking-wider hidden lg:table-cell">Waktu Pesan</th>

@@ -95,7 +95,7 @@ class LaporanController extends Controller
             $query->where('kapal_id', (int) $kapalId);
             $kapal = Kapal::find($kapalId);
             if ($kapal) {
-                $filterParts[] = "Speedboat: {$kapal->nama_kapal}";
+                $filterParts[] = "Wahana: {$kapal->nama_kapal}";
             }
         }
 
@@ -209,7 +209,7 @@ class LaporanController extends Controller
                 'Nama Pembeli',
                 'No HP',
                 'Alamat',
-                'Speedboat',
+                'Wahana',
                 'Tipe Hari',
                 'Tarif (Rp)',
                 'Diskon (Rp)',

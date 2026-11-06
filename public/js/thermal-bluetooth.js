@@ -293,13 +293,13 @@
             appendStr(this.formatRow("Kasir", t.kasir));
             appendStr("--------------------------------\n");
 
-            // 4. Data Pengunjung & Kapal
+            // 4. Data Pengunjung & Wahana
             appendStr(this.formatRow("Pengunjung", t.nama_pembeli));
             appendStr(this.formatRow("No. HP", t.no_hp));
             if (t.alamat) {
                 appendStr(this.formatRow("Alamat", t.alamat));
             }
-            appendStr(this.formatRow("Kapal", t.kapal));
+            appendStr(this.formatRow("Wahana", t.kapal));
             appendStr(this.formatRow("Hari", t.hari));
             appendStr("--------------------------------\n");
 
@@ -340,7 +340,7 @@
             // 7. Footer
             appendBytes([0x1B, 0x61, 0x01]); // Align Center
             appendStr("Tiket hanya berlaku 1x perjalanan.\n");
-            appendStr("Tunjukkan QR ke petugas kapal.\n");
+            appendStr("Tunjukkan QR ke petugas wahana.\n");
             appendBytes([0x1B, 0x45, 0x01]);
             appendStr("*** TERIMA KASIH ***\n");
             appendBytes([0x1B, 0x45, 0x00]);

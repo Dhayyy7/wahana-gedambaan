@@ -49,7 +49,7 @@ class KapalController extends Controller
 
         return redirect()
             ->route('admin.kapal.index')
-            ->with('success', "Kapal \"{$validated['nama_kapal']}\" berhasil ditambahkan.");
+            ->with('success', "Wahana \"{$validated['nama_kapal']}\" berhasil ditambahkan.");
     }
 
     /**
@@ -92,7 +92,7 @@ class KapalController extends Controller
 
         return redirect()
             ->route('admin.kapal.index')
-            ->with('success', "Data kapal \"{$kapal->nama_kapal}\" berhasil diperbarui.");
+            ->with('success', "Data wahana \"{$kapal->nama_kapal}\" berhasil diperbarui.");
     }
 
     /**
@@ -111,6 +111,6 @@ class KapalController extends Controller
 
         return redirect()
             ->route('admin.kapal.index')
-            ->with('success', "Kapal \"{$namaKapal}\" berhasil dihapus.");
+            ->with('success', "Wahana \"{$namaKapal}\" berhasil dihapus.");
     }
 }

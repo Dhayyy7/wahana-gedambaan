@@ -6,7 +6,7 @@
                 <i class="fa-solid fa-arrow-left text-sm"></i>
             </a>
             <div>
-                <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Edit Kapal</h1>
+                <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Edit Wahana</h1>
                 <p class="text-sm text-slate-500 mt-0.5">
                     Memperbarui data <span class="font-semibold text-slate-700">{{ $kapal->nama_kapal }}</span>
                 </p>
@@ -29,11 +29,11 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
                     <label for="kode_kapal" class="block text-sm font-semibold text-slate-700 mb-1.5">
-                        Kode Kapal <span class="text-red-500">*</span>
+                        Kode Wahana <span class="text-red-500">*</span>
                     </label>
                     <input type="text" id="kode_kapal" name="kode_kapal"
                         value="{{ old('kode_kapal', $kapal->kode_kapal) }}"
-                        placeholder="Contoh: SB-01"
+                        placeholder="Contoh: WH-01"
                         class="w-full px-4 py-2.5 text-sm rounded-xl border @error('kode_kapal') border-red-400 bg-red-50 @else border-slate-200 bg-slate-50 @enderror focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition font-mono" />
                     @error('kode_kapal')
                         <p class="text-red-500 text-xs mt-1.5 flex items-center gap-1"><i class="fa-solid fa-circle-exclamation"></i> {{ $message }}</p>
@@ -42,11 +42,11 @@
 
                 <div>
                     <label for="nama_kapal" class="block text-sm font-semibold text-slate-700 mb-1.5">
-                        Nama Kapal <span class="text-red-500">*</span>
+                        Nama Wahana <span class="text-red-500">*</span>
                     </label>
                     <input type="text" id="nama_kapal" name="nama_kapal"
                         value="{{ old('nama_kapal', $kapal->nama_kapal) }}"
-                        placeholder="Contoh: Speed Boat Darmawan"
+                        placeholder="Contoh: Banana Boat"
                         class="w-full px-4 py-2.5 text-sm rounded-xl border @error('nama_kapal') border-red-400 bg-red-50 @else border-slate-200 bg-slate-50 @enderror focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition" />
                     @error('nama_kapal')
                         <p class="text-red-500 text-xs mt-1.5 flex items-center gap-1"><i class="fa-solid fa-circle-exclamation"></i> {{ $message }}</p>
@@ -71,7 +71,7 @@
 
                 <div>
                     <label for="status" class="block text-sm font-semibold text-slate-700 mb-1.5">
-                        Status Kapal <span class="text-red-500">*</span>
+                        Status Wahana <span class="text-red-500">*</span>
                     </label>
                     <select id="status" name="status"
                         class="w-full px-4 py-2.5 text-sm rounded-xl border @error('status') border-red-400 bg-red-50 @else border-slate-200 bg-slate-50 @enderror focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition">
@@ -159,11 +159,11 @@
             </div>
         </div>
 
-        {{-- Foto Kapal --}}
+        {{-- Foto Wahana --}}
         <div class="bg-white rounded-2xl border border-slate-100 shadow-xs p-6 space-y-4">
             <h2 class="text-base font-bold text-slate-700 flex items-center gap-2">
                 <i class="fa-solid fa-image text-blue-500 text-sm"></i>
-                Foto Kapal
+                Foto Wahana
             </h2>
 
             @if ($kapal->foto)

@@ -31,8 +31,8 @@ class StoreTiketRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'kapal_id.required' => 'Kapal wajib dipilih.',
-            'kapal_id.exists' => 'Kapal yang dipilih tidak valid.',
+            'kapal_id.required' => 'Wahana wajib dipilih.',
+            'kapal_id.exists' => 'Wahana yang dipilih tidak valid.',
             'nama_pembeli.required' => 'Nama pembeli wajib diisi.',
             'nama_pembeli.max' => 'Nama pembeli maksimal 100 karakter.',
             'no_hp.required' => 'Nomor HP wajib diisi.',

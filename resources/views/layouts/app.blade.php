@@ -9,7 +9,7 @@
     <!-- Favicon (Logo Tab Browser) -->
     <link rel="icon" type="image/png" href="{{ asset('images/asset_login/logo.png') }}">
 
-    <title>Admin Dashboard - {{ config('app.name', 'Speedboat Gedambaan') }}</title>
+    <title>Admin Dashboard - {{ config('app.name', 'Wahana Gedambaan') }}</title>
 
     <!-- Google Fonts: Plus Jakarta Sans & Caveat -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -80,12 +80,12 @@
                             <i class="fa-solid fa-house w-5 text-center text-base"></i>
                             <span>Dashboard</span>
                         </a>
-                        <!-- Kapal (Hanya Superadmin) -->
+                        <!-- Wahana (Hanya Superadmin) -->
                         @if (Auth::user()->isSuperadmin())
                         <a href="{{ route('admin.kapal.index') }}"
                             class="flex items-center gap-3.5 px-4 py-3 text-sm font-medium rounded-2xl transition duration-150 {{ request()->routeIs('admin.kapal.*') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-slate-500 hover:text-blue-600 hover:bg-slate-50' }}">
                             <i class="fa-solid fa-ship w-5 text-center text-base"></i>
-                            <span>Kapal</span>
+                            <span>Wahana</span>
                         </a>
                         @endif
 
@@ -184,7 +184,7 @@
                             class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                             <i class="fa-solid fa-magnifying-glass text-sm"></i>
                         </div>
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari pemesanan, pelanggan, atau kapal..."
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari pemesanan, pelanggan, atau wahana..."
                             class="w-full pl-10 pr-4 py-2.5 bg-slate-50 hover:bg-slate-100/80 focus:bg-white text-xs sm:text-sm text-slate-700 placeholder-slate-400 rounded-2xl border border-slate-200/80 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition outline-none" />
                     </form>
                     @endif

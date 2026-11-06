@@ -287,7 +287,7 @@
             </tr>
             @endif
             <tr>
-                <td class="col-label">Kapal</td>
+                <td class="col-label">Wahana</td>
                 <td class="col-sep">:</td>
                 <td class="col-val font-bold">{{ $tiket->kapal->nama_kapal }}</td>
             </tr>
@@ -333,7 +333,7 @@
         <!-- Footer -->
         <div class="footer-note">
             Tiket hanya berlaku 1x perjalanan.<br>
-            Tunjukkan QR Code ke petugas kapal.
+            Tunjukkan QR Code ke petugas wahana.
         </div>
         <div class="footer-thanks">
             *** TERIMA KASIH ***

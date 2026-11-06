@@ -64,7 +64,7 @@
                         <p class="font-bold text-slate-800 text-sm">Operator</p>
                         <p class="text-[11px] text-slate-400 font-medium mt-0.5">Flag 3</p>
                         <p class="text-xs text-slate-500 mt-2 leading-relaxed">
-                            Scan QR Code tiket di dermaga dan pantau kapal berlayar.
+                            Scan QR Code tiket di lokasi dan pantau wahana beroperasi.
                         </p>
                     </label>
 
@@ -86,7 +86,7 @@
                         <p class="font-bold text-slate-800 text-sm">Superadmin</p>
                         <p class="text-[11px] text-slate-400 font-medium mt-0.5">Flag 1</p>
                         <p class="text-xs text-slate-500 mt-2 leading-relaxed">
-                            Akses penuh ke seluruh menu, data kapal, tiket, dan manajemen user.
+                            Akses penuh ke seluruh menu, data wahana, tiket, dan manajemen user.
                         </p>
                     </label>
                 </div>

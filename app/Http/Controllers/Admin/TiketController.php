@@ -68,11 +68,11 @@ class TiketController extends Controller
     {
         $kapal = Kapal::findOrFail($request->kapal_id);
 
-        // Validasi tambahan: kapal harus dalam status tersedia
+        // Validasi tambahan: wahana harus dalam status tersedia
         if (! $kapal->isTersedia()) {
             return back()
                 ->withInput()
-                ->withErrors(['kapal_id' => 'Kapal yang dipilih sedang tidak tersedia ('.$kapal->status_label.').']);
+                ->withErrors(['kapal_id' => 'Wahana yang dipilih sedang tidak tersedia ('.$kapal->status_label.').']);
         }
 
         $isWeekend = now()->isWeekend();

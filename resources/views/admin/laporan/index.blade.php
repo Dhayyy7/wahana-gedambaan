@@ -66,14 +66,14 @@
                 </select>
             </div>
 
-            {{-- Filter Kapal --}}
+            {{-- Filter Wahana --}}
             <div>
                 <label for="kapal_id" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
-                    <i class="fa-solid fa-ship mr-1 text-slate-400"></i> Speedboat
+                    <i class="fa-solid fa-ship mr-1 text-slate-400"></i> Wahana
                 </label>
                 <select name="kapal_id" id="kapal_id"
                     class="w-full text-xs sm:text-sm font-medium rounded-2xl border-slate-200 bg-slate-50/70 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 py-2.5 transition">
-                    <option value="all">Semua Kapal</option>
+                    <option value="all">Semua Wahana</option>
                     @foreach ($kapals as $kapal)
                         <option value="{{ $kapal->id }}" {{ (string) $kapalId === (string) $kapal->id ? 'selected' : '' }}>
                             {{ $kapal->nama_kapal }}
@@ -156,7 +156,7 @@
             </div>
             <div class="mt-2">
                 <p class="text-xl sm:text-2xl font-black text-emerald-600">{{ $tiketSelesai }}</p>
-                <p class="text-[11px] text-slate-400 mt-0.5">Sudah naik kapal</p>
+                <p class="text-[11px] text-slate-400 mt-0.5">Sudah naik wahana</p>
             </div>
         </div>
 
@@ -197,7 +197,7 @@
                 <p class="text-xs text-slate-400 mt-0.5">
                     Menampilkan transaksi bulan <strong class="text-slate-700">{{ $namaBulan[$bulan] ?? $bulan }} {{ $tahun }}</strong>
                     @if ($kapalId !== 'all')
-                        • Kapal: <strong class="text-slate-700">{{ $kapals->firstWhere('id', $kapalId)?->nama_kapal }}</strong>
+                        • Wahana: <strong class="text-slate-700">{{ $kapals->firstWhere('id', $kapalId)?->nama_kapal }}</strong>
                     @endif
                     @if ($status !== 'all')
                         • Status: <strong class="text-slate-700">{{ $status == 1 ? 'Sudah Digunakan' : ($status == 0 ? 'Belum Digunakan' : 'Dibatalkan') }}</strong>
@@ -228,7 +228,7 @@
                             <th class="px-5 py-3.5">Kode Tiket</th>
                             <th class="px-5 py-3.5">Waktu Pemesanan</th>
                             <th class="px-5 py-3.5">Pembeli</th>
-                            <th class="px-5 py-3.5">Speedboat</th>
+                            <th class="px-5 py-3.5">Wahana</th>
                             <th class="px-5 py-3.5">Tarif</th>
                             <th class="px-5 py-3.5">Diskon</th>
                             <th class="px-5 py-3.5 text-right">Total Bayar</th>

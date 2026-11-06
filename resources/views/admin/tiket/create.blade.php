@@ -7,7 +7,7 @@
             </a>
             <div>
                 <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Buat Tiket Baru</h1>
-                <p class="text-sm text-slate-500 mt-0.5">Isi data pengunjung dan pilih kapal.</p>
+                <p class="text-sm text-slate-500 mt-0.5">Isi data pengunjung dan pilih wahana.</p>
             </div>
         </div>
     </x-slot>
@@ -19,7 +19,7 @@
             class="hidden mb-5 bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-5 text-white shadow-lg shadow-blue-200">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-blue-100 text-xs font-medium uppercase tracking-wider mb-0.5">Kapal Dipilih</p>
+                    <p class="text-blue-100 text-xs font-medium uppercase tracking-wider mb-0.5">Wahana Dipilih</p>
                     <p id="preview-nama-kapal" class="font-bold text-lg"></p>
                 </div>
                 <div class="text-right">
@@ -37,17 +37,17 @@
         <form method="POST" action="{{ route('admin.tiket.store') }}" class="space-y-5">
             @csrf
 
-            {{-- Pilih Kapal --}}
+            {{-- Pilih Wahana --}}
             <div class="bg-white rounded-2xl border border-slate-100 shadow-xs p-6 space-y-4">
                 <h2 class="text-base font-bold text-slate-700 flex items-center gap-2">
                     <i class="fa-solid fa-ship text-blue-500 text-sm"></i>
-                    Pilih Kapal
+                    Pilih Wahana
                 </h2>
 
                 @if ($kapals->isEmpty())
                     <div class="flex items-center gap-3 bg-amber-50 border border-amber-200 text-amber-700 text-sm px-4 py-3 rounded-xl">
                         <i class="fa-solid fa-triangle-exclamation shrink-0"></i>
-                        <span>Tidak ada kapal yang tersedia saat ini. Semua kapal sedang digunakan atau maintenance.</span>
+                        <span>Tidak ada wahana yang tersedia saat ini. Semua wahana sedang digunakan atau maintenance.</span>
                     </div>
                 @else
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="kapal-options">

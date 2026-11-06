@@ -276,7 +276,7 @@
     <Cell ss:StyleID="ColHeader"><Data ss:Type="String">Nama Pembeli</Data></Cell>
     <Cell ss:StyleID="ColHeader"><Data ss:Type="String">No. HP</Data></Cell>
     <Cell ss:StyleID="ColHeader"><Data ss:Type="String">Alamat</Data></Cell>
-    <Cell ss:StyleID="ColHeader"><Data ss:Type="String">Speedboat</Data></Cell>
+    <Cell ss:StyleID="ColHeader"><Data ss:Type="String">Wahana</Data></Cell>
     <Cell ss:StyleID="ColHeader"><Data ss:Type="String">Tipe Hari</Data></Cell>
     <Cell ss:StyleID="ColHeader"><Data ss:Type="String">Tarif</Data></Cell>
     <Cell ss:StyleID="ColHeader"><Data ss:Type="String">Diskon</Data></Cell>

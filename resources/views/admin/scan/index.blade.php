@@ -9,7 +9,7 @@
                         Operator Ready
                     </span>
                 </div>
-                <p class="text-sm text-slate-500 mt-0.5">Pindai QR Code tiket pengunjung sebelum menaiki speed boat.</p>
+                <p class="text-sm text-slate-500 mt-0.5">Pindai QR Code tiket pengunjung sebelum menaiki wahana.</p>
             </div>
 
             {{-- Stat Singkat --}}
@@ -119,10 +119,10 @@
 
         </div>
 
-        {{-- ================= KOLOM KANAN: STATUS KAPAL & LOG (5 COLS) ================= --}}
+        {{-- ================= KOLOM KANAN: STATUS WAHANA & LOG (5 COLS) ================= --}}
         <div class="lg:col-span-5 space-y-5">
 
-            {{-- Card Kapal Sedang Berlayar --}}
+            {{-- Card Wahana Sedang Beroperasi --}}
             <div class="bg-white rounded-3xl border border-slate-100 shadow-xs p-5 sm:p-6">
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center gap-2.5">
@@ -130,12 +130,12 @@
                             <i class="fa-solid fa-ship"></i>
                         </div>
                         <div>
-                            <h2 class="text-base font-bold text-slate-800">Kapal Sedang Berlayar</h2>
-                            <p class="text-xs text-slate-400">Unit kapal terkunci selama berlayar (trip ~30 menit)</p>
+                            <h2 class="text-base font-bold text-slate-800">Wahana Sedang Digunakan</h2>
+                            <p class="text-xs text-slate-400">Unit wahana terkunci selama digunakan (trip ~30 menit)</p>
                         </div>
                     </div>
                     <span id="badge-kapal-berlayar" class="text-xs font-bold px-2.5 py-1 rounded-full {{ $kapalBerlayar->count() > 0 ? 'bg-sky-50 text-sky-700 border border-sky-200' : 'bg-slate-100 text-slate-500' }}">
-                        {{ $kapalBerlayar->count() }} Kapal
+                        {{ $kapalBerlayar->count() }} Wahana
                     </span>
                 </div>
 
@@ -163,7 +163,7 @@
                                 {{-- Tombol Selesai Manual --}}
                                 <button type="button" onclick="selesaiTrip({{ $kapal->id }}, '{{ $kapal->nama_kapal }}')"
                                     class="px-3 py-1.5 text-xs font-semibold rounded-xl bg-white hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-slate-200 hover:border-emerald-300 shadow-2xs transition shrink-0"
-                                    title="Klik jika kapal telah kembali bersandar di dermaga sebelum 30 menit">
+                                    title="Klik jika wahana telah selesai digunakan sebelum 30 menit">
                                     <i class="fa-solid fa-anchor mr-1 text-emerald-600"></i> Selesai
                                 </button>
                             </div>
@@ -171,7 +171,7 @@
                             {{-- Progress Bar 30 Menit --}}
                             <div class="mt-3 pt-2 border-t border-sky-100/60">
                                 <div class="flex justify-between text-[11px] text-slate-400 mb-1">
-                                    <span>Status: Berlayar</span>
+                                    <span>Status: Digunakan</span>
                                     <span class="font-semibold text-sky-700">{{ $sisaMenit }} menit tersisa</span>
                                 </div>
                                 <div class="w-full bg-sky-200/60 rounded-full h-1.5 overflow-hidden">
@@ -185,8 +185,8 @@
                     @empty
                         <div class="py-8 text-center text-slate-400 bg-slate-50/60 rounded-2xl border border-dashed border-slate-200">
                             <i class="fa-solid fa-sailboat text-3xl mb-2 opacity-30"></i>
-                            <p class="text-xs font-semibold text-slate-500">Tidak ada kapal yang sedang berlayar</p>
-                            <p class="text-[11px] text-slate-400 mt-0.5">Semua kapal yang aktif siap melayani penumpang.</p>
+                            <p class="text-xs font-semibold text-slate-500">Tidak ada wahana yang sedang digunakan</p>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Semua wahana yang aktif siap melayani pengunjung.</p>
                         </div>
                     @endforelse
                 </div>
@@ -271,7 +271,7 @@
                         </div>
                     </div>
                     <div class="flex items-center justify-between pt-1.5 border-t border-slate-200/60">
-                        <span class="text-slate-500 font-medium">Kapal Wahana</span>
+                        <span class="text-slate-500 font-medium">Wahana</span>
                         <div class="text-right">
                             <p id="modal-boarding-kapal" class="font-extrabold text-slate-800 text-sm"></p>
                             <span id="modal-boarding-kode-kapal" class="text-[10px] font-mono text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200"></span>
@@ -285,13 +285,13 @@
 
                 {{-- Pertanyaan Alert Prompt --}}
                 <div class="bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200 p-4 rounded-2xl text-center mb-5 shadow-2xs">
-                    <p class="text-[11px] text-emerald-800 uppercase tracking-wider font-bold mb-1">Konfirmasi Naik Penumpang</p>
+                    <p class="text-[11px] text-emerald-800 uppercase tracking-wider font-bold mb-1">Konfirmasi Naik Pengunjung</p>
                     <p class="text-base font-extrabold text-emerald-950 flex items-center justify-center gap-2">
                         <i class="fa-solid fa-person-walking-arrow-right text-emerald-600 text-lg"></i>
                         <span>Tiket sudah sesuai, Silahkan naik?</span>
                     </p>
                     <p class="text-[11px] text-emerald-700 mt-1">
-                        Pilih <strong>"Ya"</strong> untuk mengizinkan naik & memulai trip kapal, atau <strong>"Tidak"</strong> untuk membatalkan.
+                        Pilih <strong>"Ya"</strong> untuk mengizinkan naik & memulai sesi wahana, atau <strong>"Tidak"</strong> untuk membatalkan.
                     </p>
                 </div>
 
@@ -324,15 +324,15 @@
                     <i class="fa-solid fa-anchor"></i>
                 </div>
 
-                <h3 class="text-xl font-extrabold text-slate-800 tracking-tight">Selesaikan Trip Kapal?</h3>
+                <h3 class="text-xl font-extrabold text-slate-800 tracking-tight">Selesaikan Sesi Wahana?</h3>
 
                 <p class="text-sm text-slate-500 mt-2 leading-relaxed">
-                    Selesaikan trip kapal <span class="font-extrabold text-slate-800" id="modal-selesai-nama-kapal"></span> sekarang?
+                    Selesaikan sesi wahana <span class="font-extrabold text-slate-800" id="modal-selesai-nama-kapal"></span> sekarang?
                 </p>
 
                 <div class="mt-4 p-3 bg-sky-50 rounded-2xl border border-sky-100 text-xs text-sky-800 text-left flex items-start gap-2.5">
                     <i class="fa-solid fa-circle-info text-sky-600 mt-0.5 shrink-0"></i>
-                    <span>Kapal telah kembali bersandar di dermaga. Status unit kapal akan kembali <strong>Tersedia</strong> untuk melayani tiket berikutnya.</span>
+                    <span>Sesi wahana telah selesai. Status unit wahana akan kembali <strong>Tersedia</strong> untuk melayani tiket berikutnya.</span>
                 </div>
 
                 {{-- Tombol Aksi --}}
@@ -730,7 +730,7 @@
                             </div>
                             <div>
                                 <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Verifikasi Berhasil</span>
-                                <h3 class="text-xl font-extrabold mt-0.5 leading-tight">Penumpang Naik — Kapal Berlayar</h3>
+                                <h3 class="text-xl font-extrabold mt-0.5 leading-tight">Pengunjung Naik — Wahana Dimulai</h3>
                             </div>
                         </div>
                         <button onclick="dismissResult()" class="text-white/70 hover:text-white p-1 text-lg">
@@ -745,7 +745,7 @@
                             <p class="text-emerald-200 text-[11px] font-mono mt-0.5">${item.kode_tiket}</p>
                         </div>
                         <div class="bg-white/10 p-3 rounded-2xl backdrop-blur-2xs">
-                            <p class="text-emerald-100 text-[10px] uppercase font-medium">Kapal Ditumpangi</p>
+                            <p class="text-emerald-100 text-[10px] uppercase font-medium">Wahana</p>
                             <p class="font-bold text-sm text-white truncate">${item.kapal.nama_kapal}</p>
                             <p class="text-emerald-200 text-[11px] font-mono mt-0.5">${item.kapal.kode_kapal}</p>
                         </div>
@@ -754,13 +754,13 @@
                             <p class="font-bold text-white">${item.waktu_scan}</p>
                         </div>
                         <div class="bg-white/10 p-3 rounded-2xl backdrop-blur-2xs">
-                            <p class="text-emerald-100 text-[10px] uppercase font-medium">Estimasi Trip Selesai</p>
+                            <p class="text-emerald-100 text-[10px] uppercase font-medium">Estimasi Sesi Selesai</p>
                             <p class="font-bold text-white">${item.estimasi_kembali} WIB (~30 mnt)</p>
                         </div>
                     </div>
 
                     <div class="mt-3 text-center text-xs text-emerald-100 font-medium">
-                        <i class="fa-solid fa-circle-info mr-1"></i> Status kapal otomatis beralih ke <strong>Sedang Berlayar</strong>.
+                        <i class="fa-solid fa-circle-info mr-1"></i> Status wahana otomatis beralih ke <strong>Sedang Digunakan</strong>.
                     </div>
                 </div>
             `;
@@ -784,7 +784,7 @@
             } else if (code === 'TICKET_CANCELLED') {
                 title = 'Tiket Sudah Dibatalkan!';
             } else if (code === 'KAPAL_BUSY') {
-                title = 'Kapal Masih Berlayar!';
+                title = 'Wahana Masih Digunakan!';
             } else if (code === 'NOT_FOUND') {
                 title = 'Tiket Tidak Ditemukan!';
             }
@@ -891,7 +891,7 @@
                 closeSelesaiTripModal();
 
                 if (res.ok && data.success) {
-                    showNotificationModal('success', 'Trip Kapal Selesai!', data.message);
+                    showNotificationModal('success', 'Sesi Wahana Selesai!', data.message);
                     setTimeout(() => {
                         location.reload();
                     }, 1400);

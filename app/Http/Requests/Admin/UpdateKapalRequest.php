@@ -47,10 +47,10 @@ class UpdateKapalRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'kode_kapal.required' => 'Kode kapal wajib diisi.',
-            'kode_kapal.unique' => 'Kode kapal ini sudah digunakan, gunakan kode lain.',
-            'kode_kapal.max' => 'Kode kapal maksimal 20 karakter.',
-            'nama_kapal.required' => 'Nama kapal wajib diisi.',
+            'kode_kapal.required' => 'Kode wahana wajib diisi.',
+            'kode_kapal.unique' => 'Kode wahana ini sudah digunakan, gunakan kode lain.',
+            'kode_kapal.max' => 'Kode wahana maksimal 20 karakter.',
+            'nama_kapal.required' => 'Nama wahana wajib diisi.',
             'tarif_biasa.required' => 'Tarif hari biasa wajib diisi.',
             'tarif_biasa.numeric' => 'Tarif hari biasa harus berupa angka.',
             'tarif_weekend.required' => 'Tarif weekend wajib diisi.',
@@ -59,8 +59,8 @@ class UpdateKapalRequest extends FormRequest
             'kapasitas.required' => 'Kapasitas penumpang wajib diisi.',
             'kapasitas.integer' => 'Kapasitas harus berupa bilangan bulat.',
             'kapasitas.min' => 'Kapasitas minimal 1 penumpang.',
-            'status.required' => 'Status kapal wajib dipilih.',
-            'status.in' => 'Status kapal tidak valid.',
+            'status.required' => 'Status wahana wajib dipilih.',
+            'status.in' => 'Status wahana tidak valid.',
             'foto.image' => 'File foto harus berupa gambar.',
             'foto.mimes' => 'Format foto harus jpg, jpeg, png, atau webp.',
             'foto.max' => 'Ukuran foto maksimal 2MB.',

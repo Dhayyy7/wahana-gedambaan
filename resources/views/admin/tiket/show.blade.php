@@ -161,7 +161,7 @@
                     </div>
                     @endif
                     <div class="bg-slate-50/70 p-3 rounded-2xl">
-                        <p class="text-[11px] text-slate-400 font-medium uppercase tracking-wider mb-0.5">Kapal</p>
+                        <p class="text-[11px] text-slate-400 font-medium uppercase tracking-wider mb-0.5">Wahana</p>
                         <p class="font-bold text-slate-800 text-sm">{{ $tiket->kapal->nama_kapal }}</p>
                         <p class="text-xs text-slate-400 font-mono mt-0.5">{{ $tiket->kapal->kode_kapal }}</p>
                     </div>

@@ -32,7 +32,7 @@ class DashboardTest extends TestCase
         $response->assertSee('Bambang Sudirman');
         $response->assertSee('Speedboat Pelangi');
         $response->assertSee('Total Pemesanan');
-        $response->assertSee('Status Armada Speedboat');
+        $response->assertSee('Status Unit Wahana');
     }
 
     public function test_dashboard_kasir_menyesuaikan_konten_ke_penjualan_dan_loket(): void
@@ -80,10 +80,10 @@ class DashboardTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Operator Dermaga');
         $response->assertSee('Tiket Di-Scan Hari Ini');
-        $response->assertSee('Kesiapan Armada Kapal Dermaga');
+        $response->assertSee('Kesiapan Unit Wahana');
         $response->assertSee('Speedboat Bahari');
         $response->assertSee('Hasan Basri');
-        $response->assertSee('Scanner QR Dermaga');
+        $response->assertSee('Scanner QR Wahana');
         // Operator tidak melihat card omset/pendapatan rupiah
         $response->assertDontSee('Omset Bulan Ini');
         $response->assertDontSee('Pendapatan Bulan Ini');

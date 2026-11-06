@@ -2,13 +2,13 @@
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-                <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Manajemen Kapal</h1>
-                <p class="text-sm text-slate-500 mt-0.5">Kelola daftar speed boat yang tersedia di wahana.</p>
+                <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Manajemen Wahana</h1>
+                <p class="text-sm text-slate-500 mt-0.5">Kelola daftar wahana yang tersedia.</p>
             </div>
             <a href="{{ route('admin.kapal.create') }}"
                 class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-2xl shadow-sm shadow-blue-200 transition">
                 <i class="fa-solid fa-plus"></i>
-                Tambah Kapal
+                Tambah Wahana
             </a>
         </div>
     </x-slot>
@@ -47,7 +47,7 @@
             </div>
             <div>
                 <p class="text-2xl font-extrabold text-slate-800">{{ $totalKapal }}</p>
-                <p class="text-xs text-slate-500 font-medium">Total Kapal</p>
+                <p class="text-xs text-slate-500 font-medium">Total Wahana</p>
             </div>
         </div>
         <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-xs flex items-center gap-4">
@@ -75,15 +75,15 @@
         @if ($kapals->isEmpty())
             <div class="flex flex-col items-center justify-center py-20 text-slate-400">
                 <i class="fa-solid fa-ship text-5xl mb-4 opacity-30"></i>
-                <p class="font-semibold text-slate-500">Belum ada kapal terdaftar</p>
-                <p class="text-sm mt-1">Klik tombol "Tambah Kapal" untuk memulai.</p>
+                <p class="font-semibold text-slate-500">Belum ada wahana terdaftar</p>
+                <p class="text-sm mt-1">Klik tombol "Tambah Wahana" untuk memulai.</p>
             </div>
         @else
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-slate-100 bg-slate-50/70">
-                            <th class="px-5 py-3.5 text-left font-semibold text-slate-500 text-xs uppercase tracking-wider">Kapal</th>
+                            <th class="px-5 py-3.5 text-left font-semibold text-slate-500 text-xs uppercase tracking-wider">Wahana</th>
                             <th class="px-5 py-3.5 text-left font-semibold text-slate-500 text-xs uppercase tracking-wider hidden sm:table-cell">Kode</th>
                             <th class="px-5 py-3.5 text-right font-semibold text-slate-500 text-xs uppercase tracking-wider hidden md:table-cell">Tarif Biasa</th>
                             <th class="px-5 py-3.5 text-right font-semibold text-slate-500 text-xs uppercase tracking-wider hidden md:table-cell">Tarif Weekend</th>
@@ -160,10 +160,10 @@
                                         </a>
                                         <form method="POST" action="{{ route('admin.kapal.destroy', $kapal) }}"
                                             onsubmit="return confirmAction(event, {
-                                                title: 'Hapus Unit Kapal?',
-                                                text: 'Yakin ingin menghapus kapal {{ addslashes($kapal->nama_kapal) }} ({{ $kapal->kode_kapal }})? Data kapal ini akan dihapus permanen.',
+                                                title: 'Hapus Unit Wahana?',
+                                                text: 'Yakin ingin menghapus wahana {{ addslashes($kapal->nama_kapal) }} ({{ $kapal->kode_kapal }})? Data wahana ini akan dihapus permanen.',
                                                 type: 'danger',
-                                                confirmText: 'Ya, Hapus Kapal',
+                                                confirmText: 'Ya, Hapus Wahana',
                                                 cancelText: 'Batal'
                                             })">
                                             @csrf

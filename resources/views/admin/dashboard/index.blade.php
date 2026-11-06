@@ -20,7 +20,7 @@
                         <span class="text-2xl sm:text-3xl animate-bounce">🚤</span>
                     </div>
                     <p class="mt-2 text-xs sm:text-sm text-sky-100/90 leading-relaxed max-w-lg font-normal">
-                        Kelola armada kapal, pemesanan tiket, hak akses staf, serta pantau seluruh operasional dan pendapatan Wahana Gedambaan secara real-time.
+                        Kelola daftar wahana, pemesanan tiket, hak akses staf, serta pantau seluruh operasional dan pendapatan Wahana Gedambaan secara real-time.
                     </p>
                     <div class="mt-5 flex flex-wrap items-center gap-3">
                         <a href="{{ route('admin.tiket.index') }}"
@@ -85,7 +85,7 @@
                         <span class="text-2xl sm:text-3xl">🚢</span>
                     </div>
                     <p class="mt-2 text-xs sm:text-sm text-sky-100/90 leading-relaxed max-w-lg font-normal">
-                        Operasional dermaga & keberangkatan kapal. Verifikasi tiket penumpang dengan QR Code dan pantau kesiapan speedboat sebelum berlayar.
+                        Operasional wahana & keberangkatan. Verifikasi tiket pengunjung dengan QR Code dan pantau kesiapan wahana sebelum digunakan.
                     </p>
                     <div class="mt-5 flex flex-wrap items-center gap-3">
                         <a href="{{ route('admin.scan.index') }}"
@@ -97,7 +97,7 @@
                         <a href="#armada-section"
                             class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/20 hover:bg-white/30 text-white font-bold text-xs sm:text-sm shadow-md border border-white/20 active:scale-95 transition-all duration-200">
                             <i class="fa-solid fa-ship text-xs"></i>
-                            <span>Lihat Kesiapan Armada</span>
+                            <span>Lihat Kesiapan Wahana</span>
                         </a>
                     </div>
                 @endif
@@ -157,7 +157,7 @@
                     </div>
                 </div>
 
-                <!-- Card 3: Kapal Tersedia -->
+                <!-- Card 3: Wahana Tersedia -->
                 <div class="bg-white rounded-3xl p-5 shadow-xs border border-slate-100 flex flex-col justify-between hover:shadow-md transition">
                     <div class="flex items-start justify-between">
                         <div class="flex items-center gap-3">
@@ -165,14 +165,14 @@
                                 <i class="fa-solid fa-ship"></i>
                             </div>
                             <div>
-                                <span class="text-xs font-semibold text-slate-400 block">Kapal Siap Operasi</span>
+                                <span class="text-xs font-semibold text-slate-400 block">Wahana Siap Operasi</span>
                                 <span class="text-2xl font-extrabold text-slate-800 mt-0.5 block">{{ $kapalTersedia }}</span>
                             </div>
                         </div>
                     </div>
                     <div class="flex items-center justify-between mt-4 pt-2.5 border-t border-slate-50 text-xs">
                         <span class="text-slate-500 font-medium">
-                            Dari {{ $totalKapal }} armada
+                            Dari {{ $totalKapal }} wahana
                         </span>
                         <span class="inline-flex items-center gap-1 text-[11px] font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full">
                             <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
@@ -307,7 +307,7 @@
                     </div>
                     <div class="flex items-center justify-between mt-4 pt-2.5 border-t border-slate-50 text-xs">
                         <span class="text-slate-500 font-medium">
-                            {{ $tiketSelesaiHariIni }} tiket telah naik kapal
+                            {{ $tiketSelesaiHariIni }} tiket telah naik wahana
                         </span>
                         <span class="inline-flex items-center gap-1 text-[11px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
                             Pending
@@ -364,7 +364,7 @@
                     </div>
                 </div>
 
-                <!-- Card 3: Kapal Siap Berlayar -->
+                <!-- Card 3: Wahana Siap Beroperasi -->
                 <div class="bg-white rounded-3xl p-5 shadow-xs border border-slate-100 flex flex-col justify-between hover:shadow-md transition">
                     <div class="flex items-start justify-between">
                         <div class="flex items-center gap-3">
@@ -372,20 +372,20 @@
                                 <i class="fa-solid fa-ship"></i>
                             </div>
                             <div>
-                                <span class="text-xs font-semibold text-slate-400 block">Kapal Siap Operasi</span>
+                                <span class="text-xs font-semibold text-slate-400 block">Wahana Siap Operasi</span>
                                 <span class="text-2xl font-extrabold text-slate-800 mt-0.5 block">{{ $kapalTersedia }}</span>
                             </div>
                         </div>
                     </div>
                     <div class="flex items-center justify-between mt-4 pt-2.5 border-t border-slate-50 text-xs">
-                        <span class="text-slate-500 font-medium">Dari {{ $totalKapal }} armada</span>
+                        <span class="text-slate-500 font-medium">Dari {{ $totalKapal }} wahana</span>
                         <span class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
                             Tersedia
                         </span>
                     </div>
                 </div>
 
-                <!-- Card 4: Kapal Sedang Berlayar -->
+                <!-- Card 4: Wahana Sedang Digunakan -->
                 <div class="bg-white rounded-3xl p-5 shadow-xs border border-slate-100 flex flex-col justify-between hover:shadow-md transition">
                     <div class="flex items-start justify-between">
                         <div class="flex items-center gap-3">
@@ -393,7 +393,7 @@
                                 <i class="fa-solid fa-compass"></i>
                             </div>
                             <div>
-                                <span class="text-xs font-semibold text-slate-400 block">Kapal di Laut (Trip)</span>
+                                <span class="text-xs font-semibold text-slate-400 block">Wahana Digunakan (Trip)</span>
                                 <span class="text-2xl font-extrabold text-slate-800 mt-0.5 block">{{ $kapalBerlayar }}</span>
                             </div>
                         </div>
@@ -528,7 +528,7 @@
                                 <div class="flex items-center justify-between text-xs sm:text-sm font-semibold mb-1.5">
                                     <div class="flex items-center gap-2 text-slate-700">
                                         <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                                        <span>Sudah Digunakan (Selesai Naik Kapal)</span>
+                                        <span>Sudah Digunakan (Selesai Naik Wahana)</span>
                                     </div>
                                     <div class="text-right">
                                         <span class="font-extrabold text-slate-800">{{ $tiketSelesai }}</span>
@@ -560,7 +560,7 @@
                     </div>
 
                     @if (Auth::user()->isSuperadmin())
-                        <!-- Armada Speedboat Ringkasan Card (Khusus Superadmin) -->
+                        <!-- Unit Wahana Ringkasan Card (Khusus Superadmin) -->
                         <div class="bg-white rounded-3xl p-6 sm:p-7 shadow-xs border border-slate-100">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="flex items-center gap-2.5">
@@ -568,12 +568,12 @@
                                         <i class="fa-solid fa-ship"></i>
                                     </div>
                                     <div>
-                                        <h2 class="text-base sm:text-lg font-bold text-slate-800">Status Armada Speedboat</h2>
-                                        <p class="text-xs text-slate-400">Ketersediaan kapal untuk trip wisata</p>
+                                        <h2 class="text-base sm:text-lg font-bold text-slate-800">Status Unit Wahana</h2>
+                                        <p class="text-xs text-slate-400">Ketersediaan wahana untuk trip wisata</p>
                                     </div>
                                 </div>
                                 <a href="{{ route('admin.kapal.index') }}" class="text-xs font-bold text-sky-600 hover:text-sky-700 hover:underline">
-                                    Kelola Kapal &rarr;
+                                    Kelola Wahana &rarr;
                                 </a>
                             </div>
 
@@ -610,7 +610,7 @@
                                     </div>
                                 @empty
                                     <div class="col-span-2 py-6 text-center text-slate-400 text-xs">
-                                        Belum ada data kapal terdaftar.
+                                        Belum ada data wahana terdaftar.
                                     </div>
                                 @endforelse
                             </div>
@@ -716,7 +716,7 @@
                                 <a href="{{ route('admin.kapal.create') }}"
                                     class="p-3 bg-white hover:bg-purple-600 hover:text-white rounded-2xl border border-slate-100 text-slate-700 text-xs font-bold flex flex-col items-center justify-center gap-1.5 transition text-center shadow-2xs group">
                                     <i class="fa-solid fa-ship text-purple-600 group-hover:text-white text-base"></i>
-                                    <span>Tambah Kapal</span>
+                                    <span>Tambah Wahana</span>
                                 </a>
                             @endif
 
@@ -767,20 +767,20 @@
                 <!-- Left Column (8 Cols): Boat Fleet Management & Live Scan Log -->
                 <div class="lg:col-span-8 space-y-6">
 
-                    <!-- Alert Kapal Sedang Berlayar (Jika Ada) -->
+                    <!-- Alert Wahana Sedang Beroperasi (Jika Ada) -->
                     @if ($kapalBerlayarList->isNotEmpty())
                         <div class="bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-3xl p-6 shadow-md shadow-blue-500/20">
                             <div class="flex items-center justify-between mb-3">
                                 <div class="flex items-center gap-2.5">
                                     <span class="w-3 h-3 rounded-full bg-emerald-400 animate-ping"></span>
-                                    <h2 class="text-base font-extrabold tracking-tight">Armada Sedang Berlayar (Active Trip)</h2>
+                                    <h2 class="text-base font-extrabold tracking-tight">Wahana Sedang Digunakan (Active Trip)</h2>
                                 </div>
                                 <span class="px-3 py-1 rounded-full text-xs font-bold bg-white/20 text-white backdrop-blur-xs">
-                                    {{ $kapalBerlayarList->count() }} Kapal di Laut
+                                    {{ $kapalBerlayarList->count() }} Wahana Aktif
                                 </span>
                             </div>
                             <p class="text-xs text-sky-100 mb-4">
-                                Kapal di bawah ini sedang membawa penumpang trip wisata. Klik tombol selesai saat kapal telah kembali merapat di dermaga.
+                                Wahana di bawah ini sedang digunakan pengunjung. Klik tombol selesai saat sesi wahana telah berakhir.
                             </p>
                             <div class="space-y-3">
                                 @foreach ($kapalBerlayarList as $activeKapal)
@@ -799,10 +799,10 @@
                                         <form method="POST" action="{{ route('admin.scan.selesai-trip', $activeKapal) }}" class="w-full sm:w-auto">
                                             @csrf
                                             <button type="submit"
-                                                onclick="return confirm('Apakah kapal {{ $activeKapal->nama_kapal }} sudah selesai berlayar dan kembali bersandar di dermaga?')"
+                                                onclick="return confirm('Apakah wahana {{ $activeKapal->nama_kapal }} sudah selesai digunakan?')"
                                                 class="w-full sm:w-auto px-4 py-2 bg-emerald-400 hover:bg-emerald-300 text-slate-900 font-extrabold text-xs rounded-xl shadow-xs transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
                                                 <i class="fa-solid fa-circle-check"></i>
-                                                <span>Selesaikan Trip</span>
+                                                <span>Selesaikan Sesi</span>
                                             </button>
                                         </form>
                                     </div>
@@ -811,7 +811,7 @@
                         </div>
                     @endif
 
-                    <!-- Kesiapan Seluruh Armada Kapal Card -->
+                    <!-- Kesiapan Seluruh Unit Wahana Card -->
                     <div class="bg-white rounded-3xl p-6 sm:p-7 shadow-xs border border-slate-100">
                         <div class="flex items-center justify-between mb-5">
                             <div class="flex items-center gap-2.5">
@@ -819,12 +819,12 @@
                                     <i class="fa-solid fa-ship"></i>
                                 </div>
                                 <div>
-                                    <h2 class="text-base sm:text-lg font-bold text-slate-800">Kesiapan Armada Kapal Dermaga</h2>
-                                    <p class="text-xs text-slate-400">Status kelayakan dan kesiapan speedboat untuk penyeberangan</p>
+                                    <h2 class="text-base sm:text-lg font-bold text-slate-800">Kesiapan Unit Wahana</h2>
+                                    <p class="text-xs text-slate-400">Status kelayakan dan kesiapan wahana untuk pengunjung</p>
                                 </div>
                             </div>
                             <span class="text-xs font-bold text-slate-500 bg-slate-50 px-3 py-1 rounded-full border border-slate-100">
-                                Total: {{ $totalKapal }} Kapal
+                                Total: {{ $totalKapal }} Wahana
                             </span>
                         </div>
 
@@ -873,7 +873,7 @@
                                 </div>
                             @empty
                                 <div class="col-span-2 py-8 text-center text-slate-400 text-xs">
-                                    Belum ada data kapal terdaftar.
+                                    Belum ada data wahana terdaftar.
                                 </div>
                             @endforelse
                         </div>
@@ -888,7 +888,7 @@
                                 </div>
                                 <div>
                                     <h2 class="text-base sm:text-lg font-bold text-slate-800">Tiket Terverifikasi Terbaru</h2>
-                                    <p class="text-xs text-slate-400">Log penumpang yang baru saja di-scan naik kapal</p>
+                                    <p class="text-xs text-slate-400">Log pengunjung yang baru saja di-scan naik wahana</p>
                                 </div>
                             </div>
                             <a href="{{ route('admin.scan.index') }}" class="text-xs font-bold text-emerald-600 hover:text-emerald-700 hover:underline">
@@ -914,7 +914,7 @@
                                             </div>
                                             <p class="font-bold text-slate-800 text-xs truncate mt-0.5">{{ $scanned->nama_pembeli }}</p>
                                             <p class="text-[11px] text-slate-400 truncate">
-                                                Kapal: {{ $scanned->kapal ? $scanned->kapal->nama_kapal : '-' }}
+                                                Wahana: {{ $scanned->kapal ? $scanned->kapal->nama_kapal : '-' }}
                                             </p>
                                         </div>
                                     </div>
@@ -928,7 +928,7 @@
                             @empty
                                 <div class="py-8 text-center text-slate-400 text-xs">
                                     <i class="fa-solid fa-qrcode text-3xl mb-2 opacity-30 block"></i>
-                                    Belum ada tiket yang di-scan naik kapal hari ini.
+                                    Belum ada tiket yang di-scan naik wahana hari ini.
                                 </div>
                             @endforelse
                         </div>
@@ -944,9 +944,9 @@
                         <div class="w-16 h-16 rounded-3xl bg-white/15 backdrop-blur-xs text-white mx-auto flex items-center justify-center text-3xl mb-4 ring-4 ring-white/10">
                             <i class="fa-solid fa-qrcode"></i>
                         </div>
-                        <h3 class="text-lg font-black tracking-tight">Scanner QR Dermaga</h3>
+                        <h3 class="text-lg font-black tracking-tight">Scanner QR Wahana</h3>
                         <p class="text-xs text-emerald-100 mt-1.5 leading-relaxed">
-                            Arahkan kamera ke QR Code tiket pengunjung untuk verifikasi izin naik kapal secara instan.
+                            Arahkan kamera ke QR Code tiket pengunjung untuk verifikasi izin naik wahana secara instan.
                         </p>
                         <a href="{{ route('admin.scan.index') }}"
                             class="mt-5 w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-white text-emerald-700 font-extrabold text-sm shadow-md hover:bg-emerald-50 active:scale-95 transition">
@@ -956,7 +956,7 @@
                         </a>
                     </div>
 
-                    <!-- SOP Keselamatan Pelayaran Checklist Card -->
+                    <!-- SOP Keselamatan Checklist Card -->
                     <div class="bg-white rounded-3xl p-6 shadow-xs border border-slate-100 space-y-4">
                         <div class="flex items-center gap-2.5">
                             <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-sm">
@@ -964,18 +964,18 @@
                             </div>
                             <div>
                                 <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider">SOP Keselamatan</h3>
-                                <p class="text-[11px] text-slate-400">Protokol wajib sebelum kapal lepas dermaga</p>
+                                <p class="text-[11px] text-slate-400">Protokol wajib sebelum memulai wahana</p>
                             </div>
                         </div>
 
                         <ul class="space-y-2.5 text-xs text-slate-600">
                             <li class="flex items-start gap-2.5 p-2 rounded-xl bg-slate-50 border border-slate-100/60">
                                 <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5 text-sm"></i>
-                                <span>Pastikan seluruh penumpang mengenakan <strong>Life Jacket</strong> (Pelampung).</span>
+                                <span>Pastikan seluruh pengunjung mengenakan <strong>Life Jacket</strong> (Pelampung).</span>
                             </li>
                             <li class="flex items-start gap-2.5 p-2 rounded-xl bg-slate-50 border border-slate-100/60">
                                 <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5 text-sm"></i>
-                                <span>Jumlah penumpang <strong>tidak melebihi</strong> kapasitas maksimal kapal.</span>
+                                <span>Jumlah pengunjung <strong>tidak melebihi</strong> kapasitas maksimal wahana.</span>
                             </li>
                             <li class="flex items-start gap-2.5 p-2 rounded-xl bg-slate-50 border border-slate-100/60">
                                 <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5 text-sm"></i>
