@@ -40,7 +40,7 @@
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 text-sm font-semibold pointer-events-none">Rp</span>
                         <input type="number" id="nominal" name="nominal" value="{{ old('nominal') }}"
-                            min="1" step="1000" placeholder="50000" required
+                            min="1" step="1" placeholder="50000" required
                             class="w-full pl-10 rounded-xl border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-sm py-2.5 pr-3.5 transition" />
                     </div>
                     @error('nominal')
