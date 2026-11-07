@@ -112,26 +112,63 @@
         </form>
     </div>
 
-    {{-- Stats Cards Ringkasan Periode Terpilih --}}
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 mb-6">
-        {{-- Total Pendapatan Bersih --}}
-        <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-xs flex flex-col justify-between col-span-2 sm:col-span-1 lg:col-span-2 bg-gradient-to-br from-white to-blue-50/40">
-            <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Pendapatan Bersih</span>
-                <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm">
-                    <i class="fa-solid fa-money-bill-wave"></i>
-                </div>
-            </div>
-            <div class="mt-2">
-                <p class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">
+    {{-- Ringkasan Keuangan: Pemasukan, Pengeluaran, & Laba Bersih --}}
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+        {{-- Pemasukan Tiket --}}
+        <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-xs flex items-center justify-between bg-gradient-to-br from-white to-blue-50/40">
+            <div>
+                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Pemasukan Tiket</span>
+                <p class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight mt-1">
                     Rp {{ number_format($totalPendapatan, 0, ',', '.') }}
                 </p>
                 <p class="text-[11px] text-slate-400 mt-0.5">
                     Periode {{ $namaBulan[$bulan] ?? $bulan }} {{ $tahun }}
                 </p>
             </div>
+            <div class="w-11 h-11 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg shrink-0">
+                <i class="fa-solid fa-money-bill-wave"></i>
+            </div>
         </div>
 
+        {{-- Total Pengeluaran --}}
+        <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-xs flex items-center justify-between bg-gradient-to-br from-white to-rose-50/40">
+            <div>
+                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Pengeluaran</span>
+                <p class="text-xl sm:text-2xl font-black text-rose-600 tracking-tight mt-1">
+                    Rp {{ number_format($totalPengeluaran ?? 0, 0, ',', '.') }}
+                </p>
+                <a href="{{ route('admin.pengeluaran.index', ['bulan' => $bulan, 'tahun' => $tahun]) }}"
+                    class="text-[11px] text-rose-600 font-semibold hover:underline mt-0.5 inline-block">
+                    Lihat Rincian Pengeluaran &rarr;
+                </a>
+            </div>
+            <div class="w-11 h-11 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-lg shrink-0">
+                <i class="fa-solid fa-wallet"></i>
+            </div>
+        </div>
+
+        {{-- Laba Bersih --}}
+        @php
+            $nilaiLaba = $labaBersih ?? $totalPendapatan;
+        @endphp
+        <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-xs flex items-center justify-between bg-gradient-to-br from-white to-emerald-50/40">
+            <div>
+                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Laba Bersih (Pemasukan - Pengeluaran)</span>
+                <p class="text-xl sm:text-2xl font-black {{ $nilaiLaba >= 0 ? 'text-emerald-600' : 'text-rose-600' }} tracking-tight mt-1">
+                    Rp {{ number_format($nilaiLaba, 0, ',', '.') }}
+                </p>
+                <p class="text-[11px] text-slate-400 mt-0.5">
+                    Rekap bersih {{ $namaBulan[$bulan] ?? $bulan }} {{ $tahun }}
+                </p>
+            </div>
+            <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg shrink-0">
+                <i class="fa-solid fa-scale-balanced"></i>
+            </div>
+        </div>
+    </div>
+
+    {{-- Stats Cards Ringkasan Tiket Periode Terpilih --}}
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 mb-6">
         {{-- Total Transaksi --}}
         <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-xs flex flex-col justify-between">
             <div class="flex items-center justify-between">

@@ -23,14 +23,15 @@
                     <p id="preview-nama-kapal" class="font-bold text-lg"></p>
                 </div>
                 <div class="text-right">
-                    <p class="text-blue-100 text-xs font-medium uppercase tracking-wider mb-0.5">Total Bayar</p>
+                    <p id="preview-label-total" class="text-blue-100 text-xs font-medium uppercase tracking-wider mb-0.5">Total Bayar</p>
                     <p id="preview-total" class="font-extrabold text-2xl"></p>
                 </div>
             </div>
-            <div class="flex items-center gap-4 mt-3 pt-3 border-t border-blue-500/40 text-xs text-blue-100">
+            <div class="flex flex-wrap items-center gap-4 mt-3 pt-3 border-t border-blue-500/40 text-xs text-blue-100">
                 <span><i class="fa-solid fa-calendar-days mr-1"></i> <span id="preview-hari"></span></span>
-                <span><i class="fa-solid fa-tag mr-1"></i> Tarif: <span id="preview-tarif"></span></span>
-                <span id="preview-diskon-wrapper" class="hidden"><i class="fa-solid fa-scissors mr-1"></i> Diskon: <span id="preview-diskon"></span></span>
+                <span><i class="fa-solid fa-tag mr-1"></i> Tarif/Tiket: <span id="preview-tarif"></span></span>
+                <span><i class="fa-solid fa-layer-group mr-1"></i> Jumlah: <strong id="preview-jumlah">1 Tiket</strong></span>
+                <span id="preview-diskon-wrapper" class="hidden"><i class="fa-solid fa-scissors mr-1"></i> Diskon/Tiket: <span id="preview-diskon"></span></span>
             </div>
         </div>
 
@@ -92,6 +93,58 @@
                 @endif
             </div>
 
+            {{-- Jumlah Tiket (Sekali Buat Bisa Langsung Banyak Tiket) --}}
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-xs p-6 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <div>
+                        <h2 class="text-base font-bold text-slate-700 flex items-center gap-2">
+                            <i class="fa-solid fa-layer-group text-blue-500 text-sm"></i>
+                            Jumlah Tiket
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Buat beberapa tiket sekaligus dengan data pemesan yang sama.</p>
+                    </div>
+
+                    {{-- Stepper Input --}}
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="adjustJumlahTiket(-1)"
+                            class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-base flex items-center justify-center transition cursor-pointer">
+                            <i class="fa-solid fa-minus text-xs"></i>
+                        </button>
+                        <input type="number" id="jumlah_tiket" name="jumlah_tiket"
+                            value="{{ old('jumlah_tiket', 1) }}" min="1" max="50" required
+                            oninput="onJumlahTiketChange()"
+                            class="w-20 text-center font-extrabold text-base text-slate-800 rounded-xl border border-slate-200 py-2 px-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none" />
+                        <button type="button" onclick="adjustJumlahTiket(1)"
+                            class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-base flex items-center justify-center transition cursor-pointer">
+                            <i class="fa-solid fa-plus text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Tombol Pilih Cepat (1, 2, 3, 4, 5, 10 Tiket) --}}
+                <div class="flex flex-wrap items-center gap-2 pt-1">
+                    <span class="text-xs text-slate-400 font-medium mr-1">Pilih Cepat:</span>
+                    @foreach ([1, 2, 3, 4, 5, 10] as $preset)
+                        <button type="button" onclick="setJumlahTiket({{ $preset }})"
+                            data-preset="{{ $preset }}"
+                            class="preset-jumlah-btn px-3.5 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer {{ (int) old('jumlah_tiket', 1) === $preset ? 'bg-blue-600 text-white border-blue-600 shadow-xs' : 'bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 border-slate-200' }}">
+                            {{ $preset }} Tiket
+                        </button>
+                    @endforeach
+                </div>
+
+                <div id="multi-ticket-info" class="hidden flex items-start gap-2.5 bg-blue-50/80 border border-blue-100 text-blue-700 text-xs px-4 py-3 rounded-xl">
+                    <i class="fa-solid fa-circle-info text-blue-500 mt-0.5 shrink-0"></i>
+                    <span>
+                        Sistem akan membuat <strong id="multi-ticket-count-label">5</strong> tiket sekaligus. Data <strong>Nama Pembeli, Nomor HP, dan Alamat</strong> di bawah akan otomatis disalin ke semua tiket (masing-masing tiket tetap memiliki Kode Tiket & QR Code unik).
+                    </span>
+                </div>
+
+                @error('jumlah_tiket')
+                    <p class="text-red-500 text-xs flex items-center gap-1 mt-1"><i class="fa-solid fa-circle-exclamation"></i> {{ $message }}</p>
+                @enderror
+            </div>
+
             {{-- Data Pengunjung --}}
             <div class="bg-white rounded-2xl border border-slate-100 shadow-xs p-6 space-y-4">
                 <h2 class="text-base font-bold text-slate-700 flex items-center gap-2">
@@ -151,9 +204,10 @@
                     Batal
                 </a>
                 <button type="submit" id="btn-submit" {{ $kapals->isEmpty() ? 'disabled' : '' }}
-                    class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold px-7 py-2.5 rounded-2xl shadow-sm shadow-blue-200 transition">
+                    style="background-color: #2563eb; color: #ffffff;"
+                    class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold px-7 py-2.5 rounded-2xl shadow-sm shadow-blue-200 transition cursor-pointer">
                     <i class="fa-solid fa-ticket"></i>
-                    Buat Tiket & Cetak
+                    <span id="btn-submit-text">Buat Tiket & Cetak</span>
                 </button>
             </div>
         </form>
@@ -167,16 +221,80 @@
             return 'Rp ' + Number(angka).toLocaleString('id-ID');
         }
 
+        function getJumlahTiket() {
+            const input = document.getElementById('jumlah_tiket');
+            const val = parseInt(input ? input.value : 1, 10);
+            if (isNaN(val) || val < 1) return 1;
+            if (val > 50) return 50;
+            return val;
+        }
+
+        function setJumlahTiket(val) {
+            const input = document.getElementById('jumlah_tiket');
+            if (input) {
+                input.value = val;
+                onJumlahTiketChange();
+            }
+        }
+
+        function adjustJumlahTiket(delta) {
+            const current = getJumlahTiket();
+            const next = Math.max(1, Math.min(50, current + delta));
+            setJumlahTiket(next);
+        }
+
+        function onJumlahTiketChange() {
+            const jumlah = getJumlahTiket();
+
+            // Update highlight tombol preset
+            document.querySelectorAll('.preset-jumlah-btn').forEach(btn => {
+                const preset = parseInt(btn.getAttribute('data-preset'), 10);
+                if (preset === jumlah) {
+                    btn.className = 'preset-jumlah-btn px-3.5 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer bg-blue-600 text-white border-blue-600 shadow-xs';
+                    btn.style.backgroundColor = '#2563eb';
+                    btn.style.color = '#ffffff';
+                } else {
+                    btn.className = 'preset-jumlah-btn px-3.5 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 border-slate-200';
+                    btn.style.backgroundColor = '';
+                    btn.style.color = '';
+                }
+            });
+
+            // Tampilkan info multi-tiket jika > 1
+            const infoBox = document.getElementById('multi-ticket-info');
+            const countLabel = document.getElementById('multi-ticket-count-label');
+            const btnSubmitText = document.getElementById('btn-submit-text');
+
+            if (jumlah > 1) {
+                if (infoBox) infoBox.classList.remove('hidden');
+                if (countLabel) countLabel.textContent = jumlah;
+                if (btnSubmitText) btnSubmitText.textContent = `Buat ${jumlah} Tiket & Cetak`;
+            } else {
+                if (infoBox) infoBox.classList.add('hidden');
+                if (btnSubmitText) btnSubmitText.textContent = 'Buat Tiket & Cetak';
+            }
+
+            // Refresh preview harga jika wahana sudah dipilih
+            const checkedRadio = document.querySelector('.kapal-radio:checked');
+            if (checkedRadio) {
+                updatePreview(checkedRadio.closest('.kapal-card'));
+            }
+        }
+
         function updatePreview(label) {
+            const jumlah     = getJumlahTiket();
             const tarif      = isWeekend ? parseFloat(label.dataset.tarifWeekend) : parseFloat(label.dataset.tarifBiasa);
             const diskon     = parseFloat(label.dataset.diskon) || 0;
-            const total      = Math.max(0, tarif - diskon);
+            const hargaSatu  = Math.max(0, tarif - diskon);
+            const totalSemua = hargaSatu * jumlah;
             const nama       = label.dataset.nama.replace('>', ''); // cleanup
 
-            document.getElementById('preview-nama-kapal').textContent = nama;
-            document.getElementById('preview-total').textContent      = formatRupiah(total);
-            document.getElementById('preview-hari').textContent       = isWeekend ? 'Weekend' : 'Hari Biasa';
-            document.getElementById('preview-tarif').textContent      = formatRupiah(tarif);
+            document.getElementById('preview-nama-kapal').textContent  = nama;
+            document.getElementById('preview-label-total').textContent = jumlah > 1 ? `Total Bayar (${jumlah} Tiket)` : 'Total Bayar';
+            document.getElementById('preview-total').textContent       = formatRupiah(totalSemua);
+            document.getElementById('preview-hari').textContent        = isWeekend ? 'Weekend' : 'Hari Biasa';
+            document.getElementById('preview-tarif').textContent       = formatRupiah(hargaSatu);
+            document.getElementById('preview-jumlah').textContent      = `${jumlah} Tiket`;
 
             const diskonWrapper = document.getElementById('preview-diskon-wrapper');
             if (diskon > 0) {
@@ -212,7 +330,8 @@
             });
         });
 
-        // Init jika ada old value
+        // Init saat halaman dimuat
+        onJumlahTiketChange();
         const checkedRadio = document.querySelector('.kapal-radio:checked');
         if (checkedRadio) {
             updatePreview(checkedRadio.closest('.kapal-card'));

@@ -9,6 +9,7 @@ use App\Models\Tiket;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -64,7 +65,7 @@ class TiketController extends Controller
     }
 
     /**
-     * Simpan tiket baru — hitung tarif otomatis dari data kapal.
+     * Simpan tiket baru (mendukung pembuatan banyak tiket sekaligus dengan data pembeli yang sama).
      */
     public function store(StoreTiketRequest $request): RedirectResponse
     {
@@ -77,35 +78,58 @@ class TiketController extends Controller
                 ->withErrors(['kapal_id' => 'Wahana yang dipilih sedang tidak tersedia ('.$kapal->status_label.').']);
         }
 
+        $jumlahTiket = max(1, min(50, (int) $request->input('jumlah_tiket', 1)));
         $isWeekend = now()->isWeekend();
         $tarif = $isWeekend ? (float) $kapal->tarif_weekend : (float) $kapal->tarif_biasa;
         $diskon = (float) $kapal->diskon;
         $totalBayar = max(0, $tarif - $diskon);
+        $now = now();
 
-        $tiket = Tiket::create([
-            'kode_tiket' => Tiket::generateKodeTiket(),
-            'kapal_id' => $kapal->id,
-            'nama_pembeli' => $request->nama_pembeli,
-            'no_hp' => $request->no_hp,
-            'alamat' => $request->alamat,
-            'tarif' => $tarif,
-            'diskon' => $diskon,
-            'total_bayar' => $totalBayar,
-            'is_weekend' => $isWeekend,
-            'qr_code' => Str::uuid()->toString(),
-            'status' => Tiket::STATUS_PENDING,
-            'tanggal_pemesanan' => now(),
-        ]);
+        $createdTikets = DB::transaction(function () use ($request, $kapal, $jumlahTiket, $tarif, $diskon, $totalBayar, $isWeekend, $now) {
+            $items = collect();
+
+            for ($i = 0; $i < $jumlahTiket; $i++) {
+                $items->push(Tiket::create([
+                    'kode_tiket' => Tiket::generateKodeTiket(),
+                    'kapal_id' => $kapal->id,
+                    'nama_pembeli' => $request->nama_pembeli,
+                    'no_hp' => $request->no_hp,
+                    'alamat' => $request->alamat,
+                    'tarif' => $tarif,
+                    'diskon' => $diskon,
+                    'total_bayar' => $totalBayar,
+                    'is_weekend' => $isWeekend,
+                    'qr_code' => Str::uuid()->toString(),
+                    'status' => Tiket::STATUS_PENDING,
+                    'tanggal_pemesanan' => $now,
+                ]));
+            }
+
+            return $items;
+        });
+
+        /** @var Tiket $firstTiket */
+        $firstTiket = $createdTikets->first();
+
+        if ($jumlahTiket > 1) {
+            /** @var Tiket $lastTiket */
+            $lastTiket = $createdTikets->last();
+            $batchIds = $createdTikets->pluck('id')->implode(',');
+
+            return redirect()
+                ->route('admin.tiket.show', ['tiket' => $firstTiket->id, 'batch' => $batchIds])
+                ->with('success', "Berhasil membuat {$jumlahTiket} tiket sekaligus ({$firstTiket->kode_tiket} s/d {$lastTiket->kode_tiket})! Silakan cetak tiket.");
+        }
 
         return redirect()
-            ->route('admin.tiket.show', $tiket)
-            ->with('success', "Tiket {$tiket->kode_tiket} berhasil dibuat! Silakan cetak tiket.");
+            ->route('admin.tiket.show', $firstTiket)
+            ->with('success', "Tiket {$firstTiket->kode_tiket} berhasil dibuat! Silakan cetak tiket.");
     }
 
     /**
-     * Detail tiket + tampilan untuk print.
+     * Detail tiket + tampilan untuk print (mendukung tampilan banyak tiket sekaligus via parameter ?batch=...).
      */
-    public function show(Tiket $tiket): View
+    public function show(Request $request, Tiket $tiket): View
     {
         if ($tiket->isPending() && $tiket->isExpired()) {
             $tiket->update(['status' => Tiket::STATUS_SELESAI]);
@@ -113,13 +137,33 @@ class TiketController extends Controller
 
         $tiket->load('kapal');
 
-        return view('admin.tiket.show', compact('tiket'));
+        $batchTikets = collect([$tiket]);
+        if ($request->filled('batch')) {
+            $ids = collect(explode(',', (string) $request->query('batch')))
+                ->map(fn ($id) => (int) trim($id))
+                ->filter()
+                ->unique()
+                ->take(50);
+
+            if ($ids->isNotEmpty()) {
+                $loaded = Tiket::with('kapal')
+                    ->whereIn('id', $ids)
+                    ->orderBy('id')
+                    ->get();
+
+                if ($loaded->isNotEmpty()) {
+                    $batchTikets = $loaded;
+                }
+            }
+        }
+
+        return view('admin.tiket.show', compact('tiket', 'batchTikets'));
     }
 
     /**
-     * Halaman khusus cetak struk termal 58mm (standalone).
+     * Halaman khusus cetak struk termal 58mm (standalone, mendukung cetak banyak tiket sekaligus via ?batch=...).
      */
-    public function print(Tiket $tiket): View
+    public function print(Request $request, Tiket $tiket): View
     {
         if ($tiket->isPending() && $tiket->isExpired()) {
             $tiket->update(['status' => Tiket::STATUS_SELESAI]);
@@ -127,7 +171,27 @@ class TiketController extends Controller
 
         $tiket->load('kapal');
 
-        return view('admin.tiket.print', compact('tiket'));
+        $batchTikets = collect([$tiket]);
+        if ($request->filled('batch')) {
+            $ids = collect(explode(',', (string) $request->query('batch')))
+                ->map(fn ($id) => (int) trim($id))
+                ->filter()
+                ->unique()
+                ->take(50);
+
+            if ($ids->isNotEmpty()) {
+                $loaded = Tiket::with('kapal')
+                    ->whereIn('id', $ids)
+                    ->orderBy('id')
+                    ->get();
+
+                if ($loaded->isNotEmpty()) {
+                    $batchTikets = $loaded;
+                }
+            }
+        }
+
+        return view('admin.tiket.print', compact('tiket', 'batchTikets'));
     }
 
     /**

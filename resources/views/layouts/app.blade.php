@@ -89,12 +89,18 @@
                         </a>
                         @endif
 
-                        <!-- Pemesanan (Superadmin & Kasir) -->
+                        <!-- Pemesanan & Pengeluaran (Superadmin & Kasir) -->
                         @if (Auth::user()->isSuperadmin() || Auth::user()->isKasir())
                         <a href="{{ route('admin.tiket.index') }}"
                             class="flex items-center gap-3.5 px-4 py-3 text-sm font-medium rounded-2xl transition duration-150 {{ request()->routeIs('admin.tiket.*') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-slate-500 hover:text-blue-600 hover:bg-slate-50' }}">
                             <i class="fa-solid fa-calendar-days w-5 text-center text-base"></i>
                             <span>Pemesanan</span>
+                        </a>
+
+                        <a href="{{ route('admin.pengeluaran.index') }}"
+                            class="flex items-center gap-3.5 px-4 py-3 text-sm font-medium rounded-2xl transition duration-150 {{ request()->routeIs('admin.pengeluaran.*') ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-slate-500 hover:text-blue-600 hover:bg-slate-50' }}">
+                            <i class="fa-solid fa-wallet w-5 text-center text-base"></i>
+                            <span>Pengeluaran</span>
                         </a>
                         @endif
 

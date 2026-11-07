@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Kapal;
+use App\Models\Pengeluaran;
 use App\Models\Tiket;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -39,11 +40,17 @@ class LaporanController extends Controller
         // Summary metrics
         $statsQuery = clone $baseQuery;
         $totalTransaksi = (clone $statsQuery)->count();
-        $totalPendapatan = (clone $statsQuery)->where('status', '!=', Tiket::STATUS_BATAL)->sum('total_bayar');
-        $totalDiskon = (clone $statsQuery)->where('status', '!=', Tiket::STATUS_BATAL)->sum('diskon');
+        $totalPendapatan = (float) (clone $statsQuery)->where('status', '!=', Tiket::STATUS_BATAL)->sum('total_bayar');
+        $totalDiskon = (float) (clone $statsQuery)->where('status', '!=', Tiket::STATUS_BATAL)->sum('diskon');
         $tiketSelesai = (clone $statsQuery)->where('status', Tiket::STATUS_SELESAI)->count();
         $tiketPending = (clone $statsQuery)->where('status', Tiket::STATUS_PENDING)->count();
         $tiketBatal = (clone $statsQuery)->where('status', Tiket::STATUS_BATAL)->count();
+
+        // Rekap pengeluaran bulan terpilih & laba bersih
+        $totalPengeluaran = (float) Pengeluaran::whereMonth('tanggal_pengeluaran', $bulan)
+            ->whereYear('tanggal_pengeluaran', $tahun)
+            ->sum('nominal');
+        $labaBersih = $totalPendapatan - $totalPengeluaran;
 
         // Data transaksi dipaginate 20 per halaman
         $tikets = (clone $baseQuery)
@@ -68,6 +75,8 @@ class LaporanController extends Controller
             'status',
             'totalTransaksi',
             'totalPendapatan',
+            'totalPengeluaran',
+            'labaBersih',
             'totalDiskon',
             'tiketSelesai',
             'tiketPending',
@@ -119,11 +128,20 @@ class LaporanController extends Controller
         // Rekapitulasi KPI untuk ringkasan di atas tabel Excel
         $statsQuery = clone $query;
         $totalTransaksi = (clone $statsQuery)->count();
-        $totalPendapatan = (clone $statsQuery)->where('status', '!=', Tiket::STATUS_BATAL)->sum('total_bayar');
-        $totalDiskon = (clone $statsQuery)->where('status', '!=', Tiket::STATUS_BATAL)->sum('diskon');
+        $totalPendapatan = (float) (clone $statsQuery)->where('status', '!=', Tiket::STATUS_BATAL)->sum('total_bayar');
+        $totalDiskon = (float) (clone $statsQuery)->where('status', '!=', Tiket::STATUS_BATAL)->sum('diskon');
         $tiketSelesai = (clone $statsQuery)->where('status', Tiket::STATUS_SELESAI)->count();
         $tiketPending = (clone $statsQuery)->where('status', Tiket::STATUS_PENDING)->count();
         $tiketBatal = (clone $statsQuery)->where('status', Tiket::STATUS_BATAL)->count();
+
+        $pengeluarans = Pengeluaran::with('user')
+            ->whereMonth('tanggal_pengeluaran', $bulan)
+            ->whereYear('tanggal_pengeluaran', $tahun)
+            ->orderBy('tanggal_pengeluaran', 'asc')
+            ->orderBy('id', 'asc')
+            ->get();
+        $totalPengeluaran = (float) $pengeluarans->sum('nominal');
+        $labaBersih = $totalPendapatan - $totalPengeluaran;
 
         $tikets = $query->orderBy('tanggal_pemesanan', 'asc')->get();
 
@@ -138,6 +156,7 @@ class LaporanController extends Controller
 
         $xml = view('admin.laporan.excel', compact(
             'tikets',
+            'pengeluarans',
             'bulan',
             'tahun',
             'bulanStr',
@@ -145,6 +164,8 @@ class LaporanController extends Controller
             'filterDesc',
             'totalTransaksi',
             'totalPendapatan',
+            'totalPengeluaran',
+            'labaBersih',
             'totalDiskon',
             'tiketSelesai',
             'tiketPending',

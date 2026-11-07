@@ -70,6 +70,30 @@
    <Interior ss:Color="#eff6ff" ss:Pattern="Solid"/>
    <NumberFormat ss:Format="&quot;Rp &quot;#,##0"/>
   </Style>
+  <Style ss:ID="KpiValueExpense">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#cbd5e1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#cbd5e1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#cbd5e1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#cbd5e1"/>
+   </Borders>
+   <Font ss:FontName="Calibri" ss:Size="11" ss:Bold="1" ss:Color="#be123c"/>
+   <Interior ss:Color="#fff1f2" ss:Pattern="Solid"/>
+   <NumberFormat ss:Format="&quot;Rp &quot;#,##0"/>
+  </Style>
+  <Style ss:ID="KpiValueProfit">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#cbd5e1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#cbd5e1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#cbd5e1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#cbd5e1"/>
+   </Borders>
+   <Font ss:FontName="Calibri" ss:Size="11" ss:Bold="1" ss:Color="#047857"/>
+   <Interior ss:Color="#ecfdf5" ss:Pattern="Solid"/>
+   <NumberFormat ss:Format="&quot;Rp &quot;#,##0"/>
+  </Style>
 
   {{-- Header Tabel Data --}}
   <Style ss:ID="ColHeader">
@@ -251,20 +275,20 @@
 
    {{-- KPI Summary Box (2 Baris) --}}
    <Row ss:Height="18">
-    <Cell ss:MergeAcross="2" ss:StyleID="KpiLabel"><Data ss:Type="String">TOTAL PENDAPATAN BERSIH</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="KpiLabel"><Data ss:Type="String">PEMASUKAN TIKET</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="KpiLabel"><Data ss:Type="String">TOTAL PENGELUARAN</Data></Cell>
+    <Cell ss:MergeAcross="2" ss:StyleID="KpiLabel"><Data ss:Type="String">LABA BERSIH</Data></Cell>
     <Cell ss:MergeAcross="1" ss:StyleID="KpiLabel"><Data ss:Type="String">TOTAL TIKET</Data></Cell>
     <Cell ss:MergeAcross="1" ss:StyleID="KpiLabel"><Data ss:Type="String">SUDAH DIGUNAKAN</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="KpiLabel"><Data ss:Type="String">BELUM DIGUNAKAN</Data></Cell>
     <Cell ss:MergeAcross="1" ss:StyleID="KpiLabel"><Data ss:Type="String">DIBATALKAN (VOID)</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="KpiLabel"><Data ss:Type="String">TOTAL DISKON</Data></Cell>
    </Row>
    <Row ss:Height="22">
-    <Cell ss:MergeAcross="2" ss:StyleID="KpiValueRevenue"><Data ss:Type="Number">{{ (int) $totalPendapatan }}</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="KpiValueRevenue"><Data ss:Type="Number">{{ (int) $totalPendapatan }}</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="KpiValueExpense"><Data ss:Type="Number">{{ (int) ($totalPengeluaran ?? 0) }}</Data></Cell>
+    <Cell ss:MergeAcross="2" ss:StyleID="KpiValueProfit"><Data ss:Type="Number">{{ (int) ($labaBersih ?? $totalPendapatan) }}</Data></Cell>
     <Cell ss:MergeAcross="1" ss:StyleID="KpiValue"><Data ss:Type="Number">{{ $totalTransaksi }}</Data></Cell>
     <Cell ss:MergeAcross="1" ss:StyleID="KpiValue"><Data ss:Type="Number">{{ $tiketSelesai }}</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="KpiValue"><Data ss:Type="Number">{{ $tiketPending }}</Data></Cell>
     <Cell ss:MergeAcross="1" ss:StyleID="KpiValue"><Data ss:Type="Number">{{ $tiketBatal }}</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="KpiValueRevenue"><Data ss:Type="Number">{{ (int) $totalDiskon }}</Data></Cell>
    </Row>
    <Row ss:Height="12"></Row>
 
@@ -315,9 +339,19 @@
    @endforelse
 
    {{-- Baris Grand Total di Bawah --}}
-   <Row ss:Height="24">
-    <Cell ss:MergeAcross="9" ss:StyleID="TotalLabel"><Data ss:Type="String">TOTAL PENDAPATAN BERSIH :</Data></Cell>
+   <Row ss:Height="22">
+    <Cell ss:MergeAcross="9" ss:StyleID="TotalLabel"><Data ss:Type="String">TOTAL PEMASUKAN TIKET :</Data></Cell>
     <Cell ss:StyleID="TotalValue"><Data ss:Type="Number">{{ (int) $totalPendapatan }}</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="TotalLabel"></Cell>
+   </Row>
+   <Row ss:Height="22">
+    <Cell ss:MergeAcross="9" ss:StyleID="TotalLabel"><Data ss:Type="String">TOTAL PENGELUARAN :</Data></Cell>
+    <Cell ss:StyleID="KpiValueExpense"><Data ss:Type="Number">{{ (int) ($totalPengeluaran ?? 0) }}</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="TotalLabel"></Cell>
+   </Row>
+   <Row ss:Height="24">
+    <Cell ss:MergeAcross="9" ss:StyleID="TotalLabel"><Data ss:Type="String">LABA BERSIH (PEMASUKAN - PENGELUARAN) :</Data></Cell>
+    <Cell ss:StyleID="KpiValueProfit"><Data ss:Type="Number">{{ (int) ($labaBersih ?? $totalPendapatan) }}</Data></Cell>
     <Cell ss:MergeAcross="1" ss:StyleID="TotalLabel"></Cell>
    </Row>
   </Table>
@@ -344,5 +378,60 @@
    <ProtectObjects>False</ProtectObjects>
    <ProtectScenarios>False</ProtectScenarios>
   </WorksheetOptions>
+ </Worksheet>
+
+ <Worksheet ss:Name="Pengeluaran {{ $bulanStr }}-{{ $tahun }}">
+  <Table ss:DefaultRowHeight="18">
+   <Column ss:Width="38"/>
+   <Column ss:Width="120"/>
+   <Column ss:Width="95"/>
+   <Column ss:Width="190"/>
+   <Column ss:Width="220"/>
+   <Column ss:Width="115"/>
+   <Column ss:Width="120"/>
+
+   <Row ss:Height="24">
+    <Cell ss:MergeAcross="6" ss:StyleID="DocTitle">
+     <Data ss:Type="String">RINCIAN PENGELUARAN WAHANA GEDAMBAAN</Data>
+    </Cell>
+   </Row>
+   <Row ss:Height="18">
+    <Cell ss:MergeAcross="6" ss:StyleID="DocSubtitle">
+     <Data ss:Type="String">Periode: {{ $namaBulan[$bulan] ?? $bulan }} {{ $tahun }}</Data>
+    </Cell>
+   </Row>
+   <Row ss:Height="12"></Row>
+
+   <Row ss:Height="24">
+    <Cell ss:StyleID="ColHeader"><Data ss:Type="String">No</Data></Cell>
+    <Cell ss:StyleID="ColHeader"><Data ss:Type="String">Kode Pengeluaran</Data></Cell>
+    <Cell ss:StyleID="ColHeader"><Data ss:Type="String">Tanggal</Data></Cell>
+    <Cell ss:StyleID="ColHeader"><Data ss:Type="String">Nama Pengeluaran</Data></Cell>
+    <Cell ss:StyleID="ColHeader"><Data ss:Type="String">Keterangan</Data></Cell>
+    <Cell ss:StyleID="ColHeader"><Data ss:Type="String">Dicatat Oleh</Data></Cell>
+    <Cell ss:StyleID="ColHeader"><Data ss:Type="String">Nominal (Rp)</Data></Cell>
+   </Row>
+
+   @forelse ($pengeluarans ?? [] as $idx => $item)
+    <Row ss:Height="20">
+     <Cell ss:StyleID="CellCenter"><Data ss:Type="Number">{{ $idx + 1 }}</Data></Cell>
+     <Cell ss:StyleID="CellKode"><Data ss:Type="String">{{ $item->kode_pengeluaran }}</Data></Cell>
+     <Cell ss:StyleID="CellCenter"><Data ss:Type="String">{{ $item->tanggal_pengeluaran ? $item->tanggal_pengeluaran->format('d/m/Y') : '-' }}</Data></Cell>
+     <Cell ss:StyleID="CellLeft"><Data ss:Type="String">{{ htmlspecialchars($item->nama_pengeluaran, ENT_XML1, 'UTF-8') }}</Data></Cell>
+     <Cell ss:StyleID="CellLeft"><Data ss:Type="String">{{ htmlspecialchars($item->keterangan ?: '-', ENT_XML1, 'UTF-8') }}</Data></Cell>
+     <Cell ss:StyleID="CellCenter"><Data ss:Type="String">{{ htmlspecialchars($item->user ? $item->user->name : '-', ENT_XML1, 'UTF-8') }}</Data></Cell>
+     <Cell ss:StyleID="CellCurrencyBold"><Data ss:Type="Number">{{ (int) $item->nominal }}</Data></Cell>
+    </Row>
+   @empty
+    <Row ss:Height="24">
+     <Cell ss:MergeAcross="6" ss:StyleID="CellCenter"><Data ss:Type="String">Tidak ada data pengeluaran pada periode ini.</Data></Cell>
+    </Row>
+   @endforelse
+
+   <Row ss:Height="24">
+    <Cell ss:MergeAcross="5" ss:StyleID="TotalLabel"><Data ss:Type="String">TOTAL PENGELUARAN :</Data></Cell>
+    <Cell ss:StyleID="KpiValueExpense"><Data ss:Type="Number">{{ (int) ($totalPengeluaran ?? 0) }}</Data></Cell>
+   </Row>
+  </Table>
  </Worksheet>
 </Workbook>

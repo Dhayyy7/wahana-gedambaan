@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KapalController;
 use App\Http\Controllers\Admin\LaporanController;
+use App\Http\Controllers\Admin\PengeluaranController;
 use App\Http\Controllers\Admin\ScanController;
 use App\Http\Controllers\Admin\TiketController;
 use App\Http\Controllers\Admin\UserController;
@@ -22,11 +23,15 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
         Route::resource('kapal', KapalController::class);
     });
 
-    // Pemesanan / Tiket (Superadmin & Kasir)
+    // Pemesanan / Tiket & Catatan Pengeluaran (Superadmin & Kasir)
     Route::middleware('role:superadmin,kasir')->group(function () {
         Route::get('tiket/{tiket}/print', [TiketController::class, 'print'])->name('tiket.print');
         Route::patch('tiket/{tiket}/cancel', [TiketController::class, 'cancel'])->name('tiket.cancel');
         Route::resource('tiket', TiketController::class);
+
+        Route::get('pengeluaran/export-excel', [PengeluaranController::class, 'exportExcel'])->name('pengeluaran.export-excel');
+        Route::get('pengeluaran/export-csv', [PengeluaranController::class, 'exportCsv'])->name('pengeluaran.export-csv');
+        Route::resource('pengeluaran', PengeluaranController::class);
     });
 
     // Scan Tiket (Superadmin & Operator)

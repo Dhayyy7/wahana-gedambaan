@@ -231,12 +231,17 @@
 </head>
 <body>
 
+    @php
+        $daftarCetak = isset($batchTikets) && $batchTikets->isNotEmpty() ? $batchTikets : collect([$tiket]);
+    @endphp
+
     <div class="no-print-bar">
-        <button type="button" class="btn-print" onclick="window.print()">🖨️ Cetak Ulang</button>
+        <button type="button" class="btn-print" onclick="window.print()">🖨️ Cetak {{ $daftarCetak->count() > 1 ? 'Semua (' . $daftarCetak->count() . ' Tiket)' : 'Ulang' }}</button>
         <button type="button" class="btn-close" onclick="window.close()">Tutup</button>
     </div>
 
-    <div class="receipt-container">
+    @foreach ($daftarCetak as $idx => $itemTiket)
+    <div class="receipt-container" style="{{ ! $loop->last ? 'page-break-after: always; border-bottom: 1px dashed #94a3b8; margin-bottom: 8px;' : '' }}">
         <!-- Header -->
         <div class="text-center">
             <div class="logo-crop">
@@ -248,7 +253,7 @@
 
         <div class="divider-double"></div>
 
-        @if ($tiket->status === -1)
+        @if ($itemTiket->status === -1)
             <div style="border: 2px dashed #000; padding: 4px; text-align: center; margin: 4px 0; font-weight: bold; font-size: 11px; letter-spacing: 0.5px;">
                 *** TIKET DIBATALKAN / VOID ***
             </div>
@@ -260,12 +265,19 @@
             <tr>
                 <td class="col-label">No. Tiket</td>
                 <td class="col-sep">:</td>
-                <td class="col-val font-bold">{{ $tiket->kode_tiket }}</td>
+                <td class="col-val font-bold">{{ $itemTiket->kode_tiket }}</td>
             </tr>
+            @if ($daftarCetak->count() > 1)
+            <tr>
+                <td class="col-label">Tiket Ke</td>
+                <td class="col-sep">:</td>
+                <td class="col-val font-bold">{{ $idx + 1 }} dari {{ $daftarCetak->count() }}</td>
+            </tr>
+            @endif
             <tr>
                 <td class="col-label">Waktu</td>
                 <td class="col-sep">:</td>
-                <td class="col-val">{{ $tiket->tanggal_pemesanan->format('d/m/Y H:i') }}</td>
+                <td class="col-val">{{ $itemTiket->tanggal_pemesanan->format('d/m/Y H:i') }}</td>
             </tr>
             <tr>
                 <td class="col-label">Kasir</td>
@@ -281,29 +293,29 @@
             <tr>
                 <td class="col-label">Pengunjung</td>
                 <td class="col-sep">:</td>
-                <td class="col-val font-bold">{{ $tiket->nama_pembeli }}</td>
+                <td class="col-val font-bold">{{ $itemTiket->nama_pembeli }}</td>
             </tr>
             <tr>
                 <td class="col-label">No. HP</td>
                 <td class="col-sep">:</td>
-                <td class="col-val">{{ $tiket->no_hp }}</td>
+                <td class="col-val">{{ $itemTiket->no_hp }}</td>
             </tr>
-            @if ($tiket->alamat)
+            @if ($itemTiket->alamat)
             <tr>
                 <td class="col-label">Alamat</td>
                 <td class="col-sep">:</td>
-                <td class="col-val">{{ $tiket->alamat }}</td>
+                <td class="col-val">{{ $itemTiket->alamat }}</td>
             </tr>
             @endif
             <tr>
                 <td class="col-label">Wahana</td>
                 <td class="col-sep">:</td>
-                <td class="col-val font-bold">{{ $tiket->kapal->nama_kapal }}</td>
+                <td class="col-val font-bold">{{ $itemTiket->kapal->nama_kapal }}</td>
             </tr>
             <tr>
                 <td class="col-label">Hari</td>
                 <td class="col-sep">:</td>
-                <td class="col-val">{{ $tiket->is_weekend ? 'Weekend' : 'Hari Biasa' }}</td>
+                <td class="col-val">{{ $itemTiket->is_weekend ? 'Weekend' : 'Hari Biasa' }}</td>
             </tr>
         </table>
 
@@ -312,9 +324,9 @@
         <!-- QR Code -->
         <div class="qr-section">
             <div class="qr-box">
-                {!! QrCode::size(110)->margin(0)->generate($tiket->qr_code) !!}
+                {!! QrCode::size(110)->margin(0)->generate($itemTiket->qr_code) !!}
             </div>
-            <div class="qr-text">{{ $tiket->qr_code }}</div>
+            <div class="qr-text">{{ $itemTiket->qr_code }}</div>
         </div>
 
         <div class="divider-dashed"></div>
@@ -322,18 +334,18 @@
         <!-- Rincian Biaya -->
         <table class="calc-table">
             <tr>
-                <td>Tarif ({{ $tiket->is_weekend ? 'Weekend' : 'Biasa' }})</td>
-                <td class="text-right">Rp {{ number_format($tiket->tarif, 0, ',', '.') }}</td>
+                <td>Tarif ({{ $itemTiket->is_weekend ? 'Weekend' : 'Biasa' }})</td>
+                <td class="text-right">Rp {{ number_format($itemTiket->tarif, 0, ',', '.') }}</td>
             </tr>
-            @if ($tiket->diskon > 0)
+            @if ($itemTiket->diskon > 0)
             <tr>
                 <td>Diskon</td>
-                <td class="text-right">- Rp {{ number_format($tiket->diskon, 0, ',', '.') }}</td>
+                <td class="text-right">- Rp {{ number_format($itemTiket->diskon, 0, ',', '.') }}</td>
             </tr>
             @endif
             <tr class="total-row">
                 <td class="font-bold">TOTAL BAYAR</td>
-                <td class="text-right font-bold">Rp {{ number_format($tiket->total_bayar, 0, ',', '.') }}</td>
+                <td class="text-right font-bold">Rp {{ number_format($itemTiket->total_bayar, 0, ',', '.') }}</td>
             </tr>
         </table>
 
@@ -348,6 +360,7 @@
             *** TERIMA KASIH ***
         </div>
     </div>
+    @endforeach
 
     <script>
         // Otomatis buka dialog cetak saat halaman dibuka langsung di tab baru (bukan di dalam iframe)
