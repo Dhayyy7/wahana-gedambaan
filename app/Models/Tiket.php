@@ -5,7 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 
 class Tiket extends Model
 {
@@ -21,6 +24,7 @@ class Tiket extends Model
         'tarif',
         'diskon',
         'total_bayar',
+        'metode_pembayaran',
         'is_weekend',
         'qr_code',
         'status',
@@ -35,6 +39,10 @@ class Tiket extends Model
     public const STATUS_SELESAI = 1;
 
     public const EXPIRE_HOURS = 12;
+
+    public const METODE_TUNAI = 'tunai';
+
+    public const METODE_QRIS = 'qris';
 
     /**
      * @return array<string, string>
@@ -118,12 +126,42 @@ class Tiket extends Model
     }
 
     /**
+     * Pastikan kolom metode_pembayaran tersedia di tabel tikets
+     * (berguna jika di-deploy ke shared hosting tanpa akses terminal/SSH untuk php artisan migrate).
+     */
+    public static function ensureSchemaUpdated(): void
+    {
+        try {
+            if (Cache::get('schema_tikets_metode_pembayaran_ready')) {
+                return;
+            }
+
+            if (Schema::hasTable('tikets')) {
+                if (! Schema::hasColumn('tikets', 'metode_pembayaran')) {
+                    Schema::table('tikets', function (Blueprint $table) {
+                        $table->string('metode_pembayaran', 20)
+                            ->nullable()
+                            ->after('total_bayar')
+                            ->comment('Metode pembayaran: tunai, qris, atau null untuk data lama');
+                    });
+                }
+
+                Cache::forever('schema_tikets_metode_pembayaran_ready', true);
+            }
+        } catch (\Throwable) {
+            // Abaikan jika koneksi DB belum siap
+        }
+    }
+
+    /**
      * Otomatis ubah tiket berstatus Pending yang sudah melewati 12 jam
      * sejak tanggal_pemesanan menjadi Selesai (Sudah Digunakan) tanpa mengisi tanggal_scan,
      * untuk mengakomodasi tiket yang disobek manual oleh operator tanpa scan QR.
      */
     public static function syncExpiredTickets(): int
     {
+        static::ensureSchemaUpdated();
+
         return static::where('status', self::STATUS_PENDING)
             ->where('tanggal_pemesanan', '<=', now()->subHours(self::EXPIRE_HOURS))
             ->update([
@@ -154,6 +192,30 @@ class Tiket extends Model
             self::STATUS_PENDING => 'bg-amber-50 text-amber-700 border-amber-200',
             self::STATUS_SELESAI => 'bg-emerald-50 text-emerald-700 border-emerald-200',
             default => 'bg-slate-50 text-slate-600 border-slate-200',
+        };
+    }
+
+    /**
+     * Label metode pembayaran untuk tampilan UI & laporan.
+     */
+    public function getMetodePembayaranLabelAttribute(): string
+    {
+        return match ($this->metode_pembayaran) {
+            self::METODE_QRIS => 'QRIS',
+            self::METODE_TUNAI => 'Tunai',
+            default => '-',
+        };
+    }
+
+    /**
+     * Class badge warna untuk metode pembayaran.
+     */
+    public function getMetodePembayaranBadgeClassAttribute(): string
+    {
+        return match ($this->metode_pembayaran) {
+            self::METODE_QRIS => 'bg-sky-50 text-sky-700 border-sky-200',
+            self::METODE_TUNAI => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+            default => 'bg-slate-50 text-slate-400 border-slate-200',
         };
     }
 

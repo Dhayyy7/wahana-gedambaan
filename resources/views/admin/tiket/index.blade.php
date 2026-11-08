@@ -117,8 +117,19 @@
                     class="w-full pl-10 pr-4 py-2.5 bg-slate-50 hover:bg-slate-100/80 focus:bg-white text-xs sm:text-sm text-slate-700 placeholder-slate-400 rounded-2xl border border-slate-200/80 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition outline-none" />
             </div>
 
+            {{-- Filter Pembayaran Dropdown --}}
+            <div class="sm:w-48">
+                <select name="metode_pembayaran" onchange="this.form.submit()"
+                    class="w-full text-xs sm:text-sm font-medium rounded-2xl border-slate-200/80 bg-slate-50 hover:bg-slate-100/80 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 py-2.5 px-3.5 transition cursor-pointer">
+                    <option value="all" {{ ($metodePembayaran ?? 'all') === 'all' ? 'selected' : '' }}>Semua Pembayaran</option>
+                    <option value="tunai" {{ ($metodePembayaran ?? '') === 'tunai' ? 'selected' : '' }}>Tunai</option>
+                    <option value="qris" {{ ($metodePembayaran ?? '') === 'qris' ? 'selected' : '' }}>QRIS</option>
+                    <option value="kosong" {{ ($metodePembayaran ?? '') === 'kosong' ? 'selected' : '' }}>Belum Diisi (-)</option>
+                </select>
+            </div>
+
             {{-- Filter Status Dropdown --}}
-            <div class="sm:w-56">
+            <div class="sm:w-48">
                 <select name="status" onchange="this.form.submit()"
                     class="w-full text-xs sm:text-sm font-medium rounded-2xl border-slate-200/80 bg-slate-50 hover:bg-slate-100/80 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 py-2.5 px-3.5 transition cursor-pointer">
                     <option value="all" {{ ($status ?? 'all') === 'all' ? 'selected' : '' }}>Semua Status</option>
@@ -136,7 +147,7 @@
                     <span>Cari</span>
                 </button>
 
-                @if (!empty($search) || (!empty($status) && $status !== 'all'))
+                @if (!empty($search) || (!empty($status) && $status !== 'all') || (!empty($metodePembayaran) && $metodePembayaran !== 'all'))
                     <a href="{{ route('admin.tiket.index') }}"
                         class="p-2.5 bg-slate-100 hover:bg-slate-200 active:scale-98 text-slate-600 rounded-2xl transition"
                         title="Reset Pencarian & Filter">
@@ -188,6 +199,7 @@
                             <th class="px-5 py-3.5 text-left font-semibold text-slate-500 text-xs uppercase tracking-wider">Pembeli</th>
                             <th class="px-5 py-3.5 text-left font-semibold text-slate-500 text-xs uppercase tracking-wider hidden md:table-cell">Wahana</th>
                             <th class="px-5 py-3.5 text-right font-semibold text-slate-500 text-xs uppercase tracking-wider hidden sm:table-cell">Total Bayar</th>
+                            <th class="px-5 py-3.5 text-center font-semibold text-slate-500 text-xs uppercase tracking-wider">Pembayaran</th>
                             <th class="px-5 py-3.5 text-center font-semibold text-slate-500 text-xs uppercase tracking-wider">Status</th>
                             <th class="px-5 py-3.5 text-left font-semibold text-slate-500 text-xs uppercase tracking-wider hidden lg:table-cell">Waktu Pesan</th>
                             <th class="px-5 py-3.5 text-right font-semibold text-slate-500 text-xs uppercase tracking-wider">Aksi</th>
@@ -213,6 +225,25 @@
                                 {{-- Total --}}
                                 <td class="px-5 py-4 text-right font-semibold text-slate-800 hidden sm:table-cell {{ $tiket->status === -1 ? 'line-through text-slate-400' : '' }}">
                                     Rp {{ number_format($tiket->total_bayar, 0, ',', '.') }}
+                                </td>
+                                {{-- Metode Pembayaran --}}
+                                <td class="px-5 py-4 text-center">
+                                    @if ($tiket->metode_pembayaran === 'qris')
+                                        <span class="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-lg bg-sky-50 text-sky-700 border border-sky-200">
+                                            <i class="fa-solid fa-qrcode text-[10px]"></i> QRIS
+                                        </span>
+                                    @elseif ($tiket->metode_pembayaran === 'tunai')
+                                        <span class="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            <i class="fa-solid fa-money-bill-wave text-[10px]"></i> Tunai
+                                        </span>
+                                    @else
+                                        <a href="{{ route('admin.tiket.edit', $tiket) }}"
+                                            class="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-lg bg-slate-50 hover:bg-blue-50 text-slate-400 hover:text-blue-600 border border-dashed border-slate-200 hover:border-blue-300 transition"
+                                            title="Klik untuk mengisi jenis pembayaran">
+                                            <span>-</span>
+                                            <i class="fa-solid fa-pen text-[9px]"></i>
+                                        </a>
+                                    @endif
                                 </td>
                                 {{-- Status --}}
                                 <td class="px-5 py-4 text-center">
@@ -247,6 +278,12 @@
                                             <i class="fa-solid fa-eye text-sm"></i>
                                         </a>
 
+                                        <a href="{{ route('admin.tiket.edit', $tiket) }}"
+                                            class="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition"
+                                            title="Edit Tiket / Jenis Pembayaran">
+                                            <i class="fa-solid fa-pen-to-square text-sm"></i>
+                                        </a>
+
                                         @if ($tiket->status !== -1)
                                             <button type="button"
                                                 onclick="printSingleTicketBluetooth(this)"
@@ -259,6 +296,7 @@
                                                     'alamat' => $tiket->alamat ?? '',
                                                     'kapal' => $tiket->kapal->nama_kapal,
                                                     'hari' => $tiket->is_weekend ? 'Weekend' : 'Hari Biasa',
+                                                    'pembayaran' => $tiket->metode_pembayaran_label !== '-' ? $tiket->metode_pembayaran_label : null,
                                                     'tarif' => number_format($tiket->tarif, 0, ',', '.'),
                                                     'diskon' => (float) $tiket->diskon > 0 ? number_format($tiket->diskon, 0, ',', '.') : null,
                                                     'total' => number_format($tiket->total_bayar, 0, ',', '.'),

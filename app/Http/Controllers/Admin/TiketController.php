@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreTiketRequest;
+use App\Http\Requests\Admin\UpdateTiketRequest;
 use App\Models\Kapal;
 use App\Models\Tiket;
 use App\Models\User;
@@ -24,6 +25,7 @@ class TiketController extends Controller
 
         $search = $request->input('search');
         $status = $request->input('status', 'all');
+        $metodePembayaran = $request->input('metode_pembayaran', 'all');
 
         $query = Tiket::with('kapal');
 
@@ -45,12 +47,18 @@ class TiketController extends Controller
             $query->where('status', (int) $status);
         }
 
+        if ($metodePembayaran === 'kosong') {
+            $query->whereNull('metode_pembayaran');
+        } elseif (in_array($metodePembayaran, [Tiket::METODE_TUNAI, Tiket::METODE_QRIS], true)) {
+            $query->where('metode_pembayaran', $metodePembayaran);
+        }
+
         $tikets = $query
             ->latest('tanggal_pemesanan')
             ->paginate(10)
             ->withQueryString();
 
-        return view('admin.tiket.index', compact('tikets', 'search', 'status'));
+        return view('admin.tiket.index', compact('tikets', 'search', 'status', 'metodePembayaran'));
     }
 
     /**
@@ -58,6 +66,8 @@ class TiketController extends Controller
      */
     public function create(): View
     {
+        Tiket::ensureSchemaUpdated();
+
         // Hanya tampilkan kapal yang statusnya Tersedia
         $kapals = Kapal::where('status', Kapal::STATUS_TERSEDIA)->orderBy('nama_kapal')->get();
 
@@ -69,6 +79,8 @@ class TiketController extends Controller
      */
     public function store(StoreTiketRequest $request): RedirectResponse
     {
+        Tiket::ensureSchemaUpdated();
+
         $kapal = Kapal::findOrFail($request->kapal_id);
 
         // Validasi tambahan: wahana harus dalam status tersedia
@@ -98,6 +110,7 @@ class TiketController extends Controller
                     'tarif' => $tarif,
                     'diskon' => $diskon,
                     'total_bayar' => $totalBayar,
+                    'metode_pembayaran' => $request->metode_pembayaran,
                     'is_weekend' => $isWeekend,
                     'qr_code' => Str::uuid()->toString(),
                     'status' => Tiket::STATUS_PENDING,
@@ -195,17 +208,65 @@ class TiketController extends Controller
     }
 
     /**
-     * Daftar tiket tidak diperbarui manual oleh admin.
-     * Method ini tidak dipakai (update tiket dilakukan oleh operator scan).
+     * Form edit tiket (untuk memperbarui jenis pembayaran QRIS/Tunai dan data pengunjung).
      */
     public function edit(Tiket $tiket): View
     {
-        return view('admin.tiket.show', compact('tiket'));
+        Tiket::ensureSchemaUpdated();
+
+        $tiket->load('kapal');
+
+        $relatedCount = 0;
+        if ($tiket->tanggal_pemesanan) {
+            $relatedCount = Tiket::where('id', '!=', $tiket->id)
+                ->where('nama_pembeli', $tiket->nama_pembeli)
+                ->whereDate('tanggal_pemesanan', $tiket->tanggal_pemesanan->toDateString())
+                ->count();
+        }
+
+        return view('admin.tiket.edit', compact('tiket', 'relatedCount'));
     }
 
-    public function update(): RedirectResponse
+    /**
+     * Simpan perubahan data tiket (terutama metode pembayaran QRIS/Tunai dan data pengunjung).
+     */
+    public function update(UpdateTiketRequest $request, Tiket $tiket): RedirectResponse
     {
-        return redirect()->route('admin.tiket.index');
+        $oldNamaPembeli = $tiket->nama_pembeli;
+        $metodePembayaran = $request->filled('metode_pembayaran') ? $request->metode_pembayaran : null;
+
+        $tiket->update([
+            'metode_pembayaran' => $metodePembayaran,
+            'nama_pembeli' => $request->nama_pembeli,
+            'no_hp' => $request->no_hp,
+            'alamat' => $request->alamat,
+        ]);
+
+        $updatedRelated = 0;
+        if ($request->boolean('apply_same_buyer') && $tiket->tanggal_pemesanan && $metodePembayaran !== null) {
+            $updatedRelated = Tiket::where('id', '!=', $tiket->id)
+                ->where('nama_pembeli', $oldNamaPembeli)
+                ->whereDate('tanggal_pemesanan', $tiket->tanggal_pemesanan->toDateString())
+                ->update([
+                    'metode_pembayaran' => $metodePembayaran,
+                ]);
+        }
+
+        $pesan = "Data tiket {$tiket->kode_tiket} berhasil diperbarui.";
+        if ($updatedRelated > 0) {
+            $labelMetode = strtoupper($metodePembayaran);
+            $pesan .= " Jenis pembayaran ({$labelMetode}) juga diterapkan ke {$updatedRelated} tiket lainnya.";
+        }
+
+        if ($request->input('redirect_to') === 'laporan') {
+            return redirect()
+                ->route('admin.laporan.index')
+                ->with('success', $pesan);
+        }
+
+        return redirect()
+            ->route('admin.tiket.index')
+            ->with('success', $pesan);
     }
 
     /**

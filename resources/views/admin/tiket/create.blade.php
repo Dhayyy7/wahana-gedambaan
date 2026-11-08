@@ -136,11 +136,64 @@
                 <div id="multi-ticket-info" class="hidden flex items-start gap-2.5 bg-blue-50/80 border border-blue-100 text-blue-700 text-xs px-4 py-3 rounded-xl">
                     <i class="fa-solid fa-circle-info text-blue-500 mt-0.5 shrink-0"></i>
                     <span>
-                        Sistem akan membuat <strong id="multi-ticket-count-label">5</strong> tiket sekaligus. Data <strong>Nama Pembeli, Nomor HP, dan Alamat</strong> di bawah akan otomatis disalin ke semua tiket (masing-masing tiket tetap memiliki Kode Tiket & QR Code unik).
+                        Sistem akan membuat <strong id="multi-ticket-count-label">5</strong> tiket sekaligus. Data <strong>Nama Pembeli, Nomor HP, Alamat, dan Jenis Pembayaran</strong> di bawah akan otomatis disalin ke semua tiket (masing-masing tiket tetap memiliki Kode Tiket & QR Code unik).
                     </span>
                 </div>
 
                 @error('jumlah_tiket')
+                    <p class="text-red-500 text-xs flex items-center gap-1 mt-1"><i class="fa-solid fa-circle-exclamation"></i> {{ $message }}</p>
+                @enderror
+            </div>
+
+            {{-- Jenis Pembayaran (Tunai / QRIS) --}}
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-xs p-6 space-y-4">
+                <div>
+                    <h2 class="text-base font-bold text-slate-700 flex items-center gap-2">
+                        <i class="fa-solid fa-wallet text-blue-500 text-sm"></i>
+                        Jenis Pembayaran <span class="text-red-500">*</span>
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Pilih metode pembayaran yang digunakan pengunjung untuk mempermudah rekap laporan.</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3" id="pembayaran-options">
+                    {{-- Opsi Tunai --}}
+                    <label for="bayar_tunai"
+                        class="bayar-card relative flex items-center gap-3.5 p-4 rounded-xl border-2 border-slate-200 cursor-pointer hover:border-emerald-400 transition-all duration-150 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50/50">
+                        <input type="radio" id="bayar_tunai" name="metode_pembayaran" value="tunai"
+                            class="sr-only bayar-radio"
+                            {{ old('metode_pembayaran', 'tunai') === 'tunai' ? 'checked' : '' }} />
+                        <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg shrink-0">
+                            <i class="fa-solid fa-money-bill-wave"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="font-bold text-slate-800 text-sm">Tunai (Cash)</p>
+                            <p class="text-xs text-slate-400">Bayar uang tunai di kasir</p>
+                        </div>
+                        <div class="bayar-check absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-slate-300 flex items-center justify-center transition-all opacity-0">
+                            <i class="fa-solid fa-check text-[10px] text-white"></i>
+                        </div>
+                    </label>
+
+                    {{-- Opsi QRIS --}}
+                    <label for="bayar_qris"
+                        class="bayar-card relative flex items-center gap-3.5 p-4 rounded-xl border-2 border-slate-200 cursor-pointer hover:border-sky-400 transition-all duration-150 has-[:checked]:border-sky-500 has-[:checked]:bg-sky-50/50">
+                        <input type="radio" id="bayar_qris" name="metode_pembayaran" value="qris"
+                            class="sr-only bayar-radio"
+                            {{ old('metode_pembayaran') === 'qris' ? 'checked' : '' }} />
+                        <div class="w-11 h-11 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center text-lg shrink-0">
+                            <i class="fa-solid fa-qrcode"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="font-bold text-slate-800 text-sm">QRIS</p>
+                            <p class="text-xs text-slate-400">Scan QR pembayaran digital</p>
+                        </div>
+                        <div class="bayar-check absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-slate-300 flex items-center justify-center transition-all opacity-0">
+                            <i class="fa-solid fa-check text-[10px] text-white"></i>
+                        </div>
+                    </label>
+                </div>
+
+                @error('metode_pembayaran')
                     <p class="text-red-500 text-xs flex items-center gap-1 mt-1"><i class="fa-solid fa-circle-exclamation"></i> {{ $message }}</p>
                 @enderror
             </div>
@@ -330,8 +383,29 @@
             });
         });
 
+        // Update check state visual pembayaran
+        function updateBayarCheckmarks() {
+            document.querySelectorAll('.bayar-card').forEach(card => {
+                const radio = card.querySelector('.bayar-radio');
+                const check = card.querySelector('.bayar-check');
+                if (radio.checked) {
+                    const colorClass = radio.value === 'qris' ? ['bg-sky-600', 'border-sky-600'] : ['bg-emerald-600', 'border-emerald-600'];
+                    check.classList.remove('opacity-0', 'bg-sky-600', 'border-sky-600', 'bg-emerald-600', 'border-emerald-600');
+                    check.classList.add('opacity-100', ...colorClass);
+                } else {
+                    check.classList.add('opacity-0');
+                    check.classList.remove('opacity-100', 'bg-sky-600', 'border-sky-600', 'bg-emerald-600', 'border-emerald-600');
+                }
+            });
+        }
+
+        document.querySelectorAll('.bayar-radio').forEach(radio => {
+            radio.addEventListener('change', updateBayarCheckmarks);
+        });
+
         // Init saat halaman dimuat
         onJumlahTiketChange();
+        updateBayarCheckmarks();
         const checkedRadio = document.querySelector('.kapal-radio:checked');
         if (checkedRadio) {
             updatePreview(checkedRadio.closest('.kapal-card'));

@@ -33,9 +33,19 @@
         ];
     @endphp
 
+    {{-- Flash Messages --}}
+    @if (session('success'))
+        <div id="flash-success"
+            class="flex items-center gap-3 bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-medium px-5 py-3.5 rounded-2xl mb-6 shadow-xs">
+            <i class="fa-solid fa-circle-check text-emerald-500 shrink-0"></i>
+            <span>{{ session('success') }}</span>
+            <button onclick="document.getElementById('flash-success').remove()" class="ml-auto text-emerald-400 hover:text-emerald-600"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+    @endif
+
     {{-- Filter Form --}}
     <div class="bg-white rounded-3xl p-5 sm:p-6 border border-slate-100 shadow-xs mb-6">
-        <form method="GET" action="{{ route('admin.laporan.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 items-end">
+        <form method="GET" action="{{ route('admin.laporan.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3.5 items-end">
             {{-- Filter Bulan --}}
             <div>
                 <label for="bulan" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
@@ -82,6 +92,20 @@
                 </select>
             </div>
 
+            {{-- Filter Pembayaran --}}
+            <div>
+                <label for="metode_pembayaran" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
+                    <i class="fa-solid fa-wallet mr-1 text-slate-400"></i> Pembayaran
+                </label>
+                <select name="metode_pembayaran" id="metode_pembayaran"
+                    class="w-full text-xs sm:text-sm font-medium rounded-2xl border-slate-200 bg-slate-50/70 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 py-2.5 transition">
+                    <option value="all" {{ ($metodePembayaran ?? 'all') === 'all' ? 'selected' : '' }}>Semua Pembayaran</option>
+                    <option value="tunai" {{ ($metodePembayaran ?? '') === 'tunai' ? 'selected' : '' }}>Tunai</option>
+                    <option value="qris" {{ ($metodePembayaran ?? '') === 'qris' ? 'selected' : '' }}>QRIS</option>
+                    <option value="kosong" {{ ($metodePembayaran ?? '') === 'kosong' ? 'selected' : '' }}>Belum Diisi (-)</option>
+                </select>
+            </div>
+
             {{-- Filter Status --}}
             <div>
                 <label for="status" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
@@ -121,9 +145,14 @@
                 <p class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight mt-1">
                     Rp {{ number_format($totalPendapatan, 0, ',', '.') }}
                 </p>
-                <p class="text-[11px] text-slate-400 mt-0.5">
-                    Periode {{ $namaBulan[$bulan] ?? $bulan }} {{ $tahun }}
-                </p>
+                <div class="flex flex-wrap items-center gap-2 mt-1.5 text-[11px]">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200/60">
+                        <i class="fa-solid fa-money-bill-wave text-[9px]"></i> Tunai: Rp {{ number_format($pendapatanTunai ?? 0, 0, ',', '.') }}
+                    </span>
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 font-semibold border border-sky-200/60">
+                        <i class="fa-solid fa-qrcode text-[9px]"></i> QRIS: Rp {{ number_format($pendapatanQris ?? 0, 0, ',', '.') }}
+                    </span>
+                </div>
             </div>
             <div class="w-11 h-11 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg shrink-0">
                 <i class="fa-solid fa-money-bill-wave"></i>
@@ -269,6 +298,7 @@
                             <th class="px-5 py-3.5">Tarif</th>
                             <th class="px-5 py-3.5">Diskon</th>
                             <th class="px-5 py-3.5 text-right">Total Bayar</th>
+                            <th class="px-5 py-3.5 text-center">Pembayaran</th>
                             <th class="px-5 py-3.5 text-center">Status</th>
                             <th class="px-5 py-3.5 text-center">Aksi</th>
                         </tr>
@@ -311,6 +341,24 @@
                                     Rp {{ number_format($tiket->total_bayar, 0, ',', '.') }}
                                 </td>
                                 <td class="px-5 py-3.5 text-center">
+                                    @if ($tiket->metode_pembayaran === 'qris')
+                                        <span class="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-lg bg-sky-50 text-sky-700 border border-sky-200">
+                                            <i class="fa-solid fa-qrcode text-[10px]"></i> QRIS
+                                        </span>
+                                    @elseif ($tiket->metode_pembayaran === 'tunai')
+                                        <span class="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            <i class="fa-solid fa-money-bill-wave text-[10px]"></i> Tunai
+                                        </span>
+                                    @else
+                                        <a href="{{ route('admin.tiket.edit', ['tiket' => $tiket->id, 'redirect_to' => 'laporan']) }}"
+                                            class="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-lg bg-slate-50 hover:bg-blue-50 text-slate-400 hover:text-blue-600 border border-dashed border-slate-200 hover:border-blue-300 transition"
+                                            title="Klik untuk mengisi jenis pembayaran">
+                                            <span>-</span>
+                                            <i class="fa-solid fa-pen text-[9px]"></i>
+                                        </a>
+                                    @endif
+                                </td>
+                                <td class="px-5 py-3.5 text-center">
                                     @if ($tiket->status === 1)
                                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"
                                             title="{{ $tiket->tanggal_scan ? 'Di-scan QR: ' . $tiket->tanggal_scan->format('d/m/Y H:i') : 'Selesai Otomatis 12 Jam (Manual)' }}">
@@ -330,11 +378,18 @@
                                     @endif
                                 </td>
                                 <td class="px-5 py-3.5 text-center">
-                                    <a href="{{ route('admin.tiket.show', $tiket) }}"
-                                        class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition inline-block"
-                                        title="Lihat Detail Tiket">
-                                        <i class="fa-solid fa-eye text-sm"></i>
-                                    </a>
+                                    <div class="flex items-center justify-center gap-1">
+                                        <a href="{{ route('admin.tiket.show', $tiket) }}"
+                                            class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition inline-block"
+                                            title="Lihat Detail Tiket">
+                                            <i class="fa-solid fa-eye text-sm"></i>
+                                        </a>
+                                        <a href="{{ route('admin.tiket.edit', ['tiket' => $tiket->id, 'redirect_to' => 'laporan']) }}"
+                                            class="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition inline-block"
+                                            title="Edit Tiket / Jenis Pembayaran">
+                                            <i class="fa-solid fa-pen-to-square text-sm"></i>
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach

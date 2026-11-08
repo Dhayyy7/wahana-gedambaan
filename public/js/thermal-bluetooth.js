@@ -335,6 +335,9 @@
             appendBytes([0x1B, 0x45, 0x01]); // Bold ON
             appendStr(this.formatTwoCols("TOTAL BAYAR", "Rp " + t.total));
             appendBytes([0x1B, 0x45, 0x00]); // Bold OFF
+            if (t.pembayaran) {
+                appendStr(this.formatTwoCols("Pembayaran", t.pembayaran));
+            }
             appendStr("================================\n");
 
             // 7. Footer

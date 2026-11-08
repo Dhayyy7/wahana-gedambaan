@@ -347,6 +347,12 @@
                 <td class="font-bold">TOTAL BAYAR</td>
                 <td class="text-right font-bold">Rp {{ number_format($itemTiket->total_bayar, 0, ',', '.') }}</td>
             </tr>
+            @if ($itemTiket->metode_pembayaran)
+            <tr>
+                <td>Pembayaran</td>
+                <td class="text-right font-bold">{{ $itemTiket->metode_pembayaran_label }}</td>
+            </tr>
+            @endif
         </table>
 
         <div class="divider-double"></div>

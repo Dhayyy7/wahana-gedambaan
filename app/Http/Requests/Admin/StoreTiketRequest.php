@@ -20,6 +20,7 @@ class StoreTiketRequest extends FormRequest
         return [
             'kapal_id' => ['required', 'integer', 'exists:kapals,id'],
             'jumlah_tiket' => ['nullable', 'integer', 'min:1', 'max:50'],
+            'metode_pembayaran' => ['required', 'string', 'in:tunai,qris'],
             'nama_pembeli' => ['required', 'string', 'max:100'],
             'no_hp' => ['required', 'string', 'max:20'],
             'alamat' => ['nullable', 'string', 'max:500'],
@@ -37,6 +38,8 @@ class StoreTiketRequest extends FormRequest
             'jumlah_tiket.integer' => 'Jumlah tiket harus berupa angka.',
             'jumlah_tiket.min' => 'Jumlah tiket minimal 1.',
             'jumlah_tiket.max' => 'Sekali pembuatan maksimal 50 tiket.',
+            'metode_pembayaran.required' => 'Jenis pembayaran (Tunai / QRIS) wajib dipilih.',
+            'metode_pembayaran.in' => 'Jenis pembayaran harus Tunai atau QRIS.',
             'nama_pembeli.required' => 'Nama pembeli wajib diisi.',
             'nama_pembeli.max' => 'Nama pembeli maksimal 100 karakter.',
             'no_hp.required' => 'Nomor HP wajib diisi.',

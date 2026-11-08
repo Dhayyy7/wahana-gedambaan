@@ -25,6 +25,12 @@
 
             {{-- Action Buttons --}}
             <div class="flex flex-wrap items-center gap-2 print:hidden">
+                <a href="{{ route('admin.tiket.edit', $tiket) }}"
+                    class="inline-flex items-center gap-2 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 text-sm font-semibold px-4 py-2.5 rounded-2xl transition"
+                    title="Edit Data Tiket / Jenis Pembayaran">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    Edit Tiket
+                </a>
                 @if ($tiket->status === 0)
                     <form method="POST" action="{{ route('admin.tiket.cancel', $tiket) }}"
                         onsubmit="return confirmAction(event, {
@@ -217,11 +223,19 @@
                     </div>
                     <div class="bg-slate-50/70 p-3 rounded-2xl">
                         <p class="text-[11px] text-slate-400 font-medium uppercase tracking-wider mb-0.5">Waktu Pemesanan</p>
-                        <p class="font-semibold text-slate-700 text-sm">{{ $tiket->tanggal_pemesanan->format('d M Y, H:i') }}</p>
+                        <p class="font-semibold text-slate-700 text-sm">{{ $tiket->tanggal_pemesanan->format('d M Y, H:i') }} WIB</p>
                     </div>
                     <div class="bg-slate-50/70 p-3 rounded-2xl">
-                        <p class="text-[11px] text-slate-400 font-medium uppercase tracking-wider mb-0.5">Kasir</p>
-                        <p class="font-semibold text-slate-700 text-sm">{{ Auth::user()->name }}</p>
+                        <p class="text-[11px] text-slate-400 font-medium uppercase tracking-wider mb-0.5">Metode Pembayaran</p>
+                        <p class="font-bold text-slate-800 text-sm">
+                            @if ($tiket->metode_pembayaran === 'qris')
+                                <span class="text-sky-700"><i class="fa-solid fa-qrcode mr-1"></i> QRIS</span>
+                            @elseif ($tiket->metode_pembayaran === 'tunai')
+                                <span class="text-emerald-700"><i class="fa-solid fa-money-bill-wave mr-1"></i> Tunai</span>
+                            @else
+                                <span class="text-slate-400 font-normal">- (Belum diisi)</span>
+                            @endif
+                        </p>
                     </div>
                 </div>
 
@@ -296,6 +310,7 @@
             'alamat' => $item->alamat ?? '',
             'kapal' => $item->kapal->nama_kapal,
             'hari' => $item->is_weekend ? 'Weekend' : 'Hari Biasa',
+            'pembayaran' => $item->metode_pembayaran_label !== '-' ? $item->metode_pembayaran_label : null,
             'tarif' => number_format($item->tarif, 0, ',', '.'),
             'diskon' => (float) $item->diskon > 0 ? number_format($item->diskon, 0, ',', '.') : null,
             'total' => number_format($item->total_bayar, 0, ',', '.'),

@@ -24,6 +24,7 @@ class LaporanController extends Controller
         $tahun = (int) $request->input('tahun', now()->year);
         $kapalId = $request->input('kapal_id', 'all');
         $status = $request->input('status', 'all');
+        $metodePembayaran = $request->input('metode_pembayaran', 'all');
 
         $baseQuery = Tiket::with('kapal')
             ->whereMonth('tanggal_pemesanan', $bulan)
@@ -37,10 +38,18 @@ class LaporanController extends Controller
             $baseQuery->where('status', (int) $status);
         }
 
+        if ($metodePembayaran === 'kosong') {
+            $baseQuery->whereNull('metode_pembayaran');
+        } elseif (in_array($metodePembayaran, [Tiket::METODE_TUNAI, Tiket::METODE_QRIS], true)) {
+            $baseQuery->where('metode_pembayaran', $metodePembayaran);
+        }
+
         // Summary metrics
         $statsQuery = clone $baseQuery;
         $totalTransaksi = (clone $statsQuery)->count();
         $totalPendapatan = (float) (clone $statsQuery)->where('status', '!=', Tiket::STATUS_BATAL)->sum('total_bayar');
+        $pendapatanTunai = (float) (clone $statsQuery)->where('status', '!=', Tiket::STATUS_BATAL)->where('metode_pembayaran', Tiket::METODE_TUNAI)->sum('total_bayar');
+        $pendapatanQris = (float) (clone $statsQuery)->where('status', '!=', Tiket::STATUS_BATAL)->where('metode_pembayaran', Tiket::METODE_QRIS)->sum('total_bayar');
         $totalDiskon = (float) (clone $statsQuery)->where('status', '!=', Tiket::STATUS_BATAL)->sum('diskon');
         $tiketSelesai = (clone $statsQuery)->where('status', Tiket::STATUS_SELESAI)->count();
         $tiketPending = (clone $statsQuery)->where('status', Tiket::STATUS_PENDING)->count();
@@ -73,8 +82,11 @@ class LaporanController extends Controller
             'tahun',
             'kapalId',
             'status',
+            'metodePembayaran',
             'totalTransaksi',
             'totalPendapatan',
+            'pendapatanTunai',
+            'pendapatanQris',
             'totalPengeluaran',
             'labaBersih',
             'totalDiskon',
@@ -97,6 +109,7 @@ class LaporanController extends Controller
         $tahun = (int) $request->input('tahun', now()->year);
         $kapalId = $request->input('kapal_id', 'all');
         $status = $request->input('status', 'all');
+        $metodePembayaran = $request->input('metode_pembayaran', 'all');
 
         $query = Tiket::with('kapal')
             ->whereMonth('tanggal_pemesanan', $bulan)
@@ -123,12 +136,22 @@ class LaporanController extends Controller
             $filterParts[] = "Status: {$statusText}";
         }
 
+        if ($metodePembayaran === 'kosong') {
+            $query->whereNull('metode_pembayaran');
+            $filterParts[] = 'Pembayaran: Belum Diisi';
+        } elseif (in_array($metodePembayaran, [Tiket::METODE_TUNAI, Tiket::METODE_QRIS], true)) {
+            $query->where('metode_pembayaran', $metodePembayaran);
+            $filterParts[] = 'Pembayaran: '.strtoupper($metodePembayaran);
+        }
+
         $filterDesc = implode(' • ', $filterParts);
 
         // Rekapitulasi KPI untuk ringkasan di atas tabel Excel
         $statsQuery = clone $query;
         $totalTransaksi = (clone $statsQuery)->count();
         $totalPendapatan = (float) (clone $statsQuery)->where('status', '!=', Tiket::STATUS_BATAL)->sum('total_bayar');
+        $pendapatanTunai = (float) (clone $statsQuery)->where('status', '!=', Tiket::STATUS_BATAL)->where('metode_pembayaran', Tiket::METODE_TUNAI)->sum('total_bayar');
+        $pendapatanQris = (float) (clone $statsQuery)->where('status', '!=', Tiket::STATUS_BATAL)->where('metode_pembayaran', Tiket::METODE_QRIS)->sum('total_bayar');
         $totalDiskon = (float) (clone $statsQuery)->where('status', '!=', Tiket::STATUS_BATAL)->sum('diskon');
         $tiketSelesai = (clone $statsQuery)->where('status', Tiket::STATUS_SELESAI)->count();
         $tiketPending = (clone $statsQuery)->where('status', Tiket::STATUS_PENDING)->count();
@@ -164,6 +187,8 @@ class LaporanController extends Controller
             'filterDesc',
             'totalTransaksi',
             'totalPendapatan',
+            'pendapatanTunai',
+            'pendapatanQris',
             'totalPengeluaran',
             'labaBersih',
             'totalDiskon',
@@ -191,6 +216,7 @@ class LaporanController extends Controller
         $tahun = (int) $request->input('tahun', now()->year);
         $kapalId = $request->input('kapal_id', 'all');
         $status = $request->input('status', 'all');
+        $metodePembayaran = $request->input('metode_pembayaran', 'all');
 
         $query = Tiket::with('kapal')
             ->whereMonth('tanggal_pemesanan', $bulan)
@@ -202,6 +228,12 @@ class LaporanController extends Controller
 
         if ($status !== 'all' && $status !== '' && $status !== null) {
             $query->where('status', (int) $status);
+        }
+
+        if ($metodePembayaran === 'kosong') {
+            $query->whereNull('metode_pembayaran');
+        } elseif (in_array($metodePembayaran, [Tiket::METODE_TUNAI, Tiket::METODE_QRIS], true)) {
+            $query->where('metode_pembayaran', $metodePembayaran);
         }
 
         $namaBulan = [
@@ -225,7 +257,7 @@ class LaporanController extends Controller
             // Header informasi dokumen
             fputcsv($handle, ['LAPORAN TRANSAKSI WAHANA GEDAMBAAN'], ';');
             fputcsv($handle, ['Periode', ($namaBulan[$bulan] ?? $bulan).' '.$tahun], ';');
-            fputcsv($handle, ['Waktu Download', now()->format('d/m/Y H:i:s')], ';');
+            fputcsv($handle, ['Waktu Download', now()->format('d/m/Y H:i:s').' WIB'], ';');
             fputcsv($handle, [], ';');
 
             // Header tabel
@@ -241,6 +273,7 @@ class LaporanController extends Controller
                 'Tarif (Rp)',
                 'Diskon (Rp)',
                 'Total Bayar (Rp)',
+                'Metode Pembayaran',
                 'Status',
                 'Waktu Scan/Boarding',
             ], ';');
@@ -267,6 +300,7 @@ class LaporanController extends Controller
                         (int) $tiket->tarif,
                         (int) $tiket->diskon,
                         (int) $tiket->total_bayar,
+                        $tiket->metode_pembayaran_label,
                         $statusLabel,
                         $tiket->tanggal_scan
                             ? $tiket->tanggal_scan->format('d/m/Y H:i')

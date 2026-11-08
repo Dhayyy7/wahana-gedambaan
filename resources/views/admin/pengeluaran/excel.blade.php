@@ -165,7 +165,7 @@
    </Row>
    <Row ss:Height="16">
     <Cell ss:MergeAcross="6" ss:StyleID="DocMeta">
-     <Data ss:Type="String">Waktu Unduh: {{ now()->format('d/m/Y H:i:s') }} WITA | Dicetak oleh: {{ Auth::user()->name ?? 'Admin' }}</Data>
+     <Data ss:Type="String">Waktu Unduh: {{ now()->format('d/m/Y H:i:s') }} WIB | Dicetak oleh: {{ Auth::user()->name ?? 'Admin' }}</Data>
     </Cell>
    </Row>
    <Row ss:Height="8"></Row>

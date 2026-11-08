@@ -247,28 +247,29 @@
    <Column ss:Width="140"/> {{-- 4: Nama Pembeli --}}
    <Column ss:Width="105"/> {{-- 5: No HP --}}
    <Column ss:Width="120"/> {{-- 6: Alamat --}}
-   <Column ss:Width="120"/> {{-- 7: Speedboat --}}
+   <Column ss:Width="120"/> {{-- 7: Wahana --}}
    <Column ss:Width="85"/>  {{-- 8: Tipe Hari --}}
    <Column ss:Width="85"/>  {{-- 9: Tarif --}}
    <Column ss:Width="80"/>  {{-- 10: Diskon --}}
    <Column ss:Width="100"/> {{-- 11: Total Bayar --}}
-   <Column ss:Width="115"/> {{-- 12: Status --}}
-   <Column ss:Width="120"/> {{-- 13: Waktu Scan/Boarding --}}
+   <Column ss:Width="85"/>  {{-- 12: Pembayaran --}}
+   <Column ss:Width="115"/> {{-- 13: Status --}}
+   <Column ss:Width="120"/> {{-- 14: Waktu Scan/Boarding --}}
 
    {{-- Judul Laporan --}}
    <Row ss:Height="24">
-    <Cell ss:MergeAcross="12" ss:StyleID="DocTitle">
+    <Cell ss:MergeAcross="13" ss:StyleID="DocTitle">
      <Data ss:Type="String">LAPORAN TRANSAKSI WAHANA GEDAMBAAN</Data>
     </Cell>
    </Row>
    <Row ss:Height="18">
-    <Cell ss:MergeAcross="12" ss:StyleID="DocSubtitle">
+    <Cell ss:MergeAcross="13" ss:StyleID="DocSubtitle">
      <Data ss:Type="String">Periode: {{ $namaBulan[$bulan] ?? $bulan }} {{ $tahun }} {{ $filterDesc ? '• '.$filterDesc : '' }}</Data>
     </Cell>
    </Row>
    <Row ss:Height="16">
-    <Cell ss:MergeAcross="12" ss:StyleID="DocMeta">
-     <Data ss:Type="String">Waktu Unduh: {{ now()->format('d/m/Y H:i:s') }} WITA | Dicetak oleh: {{ Auth::user()->name ?? 'Admin' }}</Data>
+    <Cell ss:MergeAcross="13" ss:StyleID="DocMeta">
+     <Data ss:Type="String">Waktu Unduh: {{ now()->format('d/m/Y H:i:s') }} WIB | Dicetak oleh: {{ Auth::user()->name ?? 'Admin' }}</Data>
     </Cell>
    </Row>
    <Row ss:Height="8"></Row>
@@ -276,19 +277,21 @@
    {{-- KPI Summary Box (2 Baris) --}}
    <Row ss:Height="18">
     <Cell ss:MergeAcross="1" ss:StyleID="KpiLabel"><Data ss:Type="String">PEMASUKAN TIKET</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="KpiLabel"><Data ss:Type="String">PEMBAYARAN TUNAI</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="KpiLabel"><Data ss:Type="String">PEMBAYARAN QRIS</Data></Cell>
     <Cell ss:MergeAcross="1" ss:StyleID="KpiLabel"><Data ss:Type="String">TOTAL PENGELUARAN</Data></Cell>
-    <Cell ss:MergeAcross="2" ss:StyleID="KpiLabel"><Data ss:Type="String">LABA BERSIH</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="KpiLabel"><Data ss:Type="String">LABA BERSIH</Data></Cell>
     <Cell ss:MergeAcross="1" ss:StyleID="KpiLabel"><Data ss:Type="String">TOTAL TIKET</Data></Cell>
     <Cell ss:MergeAcross="1" ss:StyleID="KpiLabel"><Data ss:Type="String">SUDAH DIGUNAKAN</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="KpiLabel"><Data ss:Type="String">DIBATALKAN (VOID)</Data></Cell>
    </Row>
    <Row ss:Height="22">
     <Cell ss:MergeAcross="1" ss:StyleID="KpiValueRevenue"><Data ss:Type="Number">{{ (int) $totalPendapatan }}</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="KpiValueRevenue"><Data ss:Type="Number">{{ (int) ($pendapatanTunai ?? 0) }}</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="KpiValueRevenue"><Data ss:Type="Number">{{ (int) ($pendapatanQris ?? 0) }}</Data></Cell>
     <Cell ss:MergeAcross="1" ss:StyleID="KpiValueExpense"><Data ss:Type="Number">{{ (int) ($totalPengeluaran ?? 0) }}</Data></Cell>
-    <Cell ss:MergeAcross="2" ss:StyleID="KpiValueProfit"><Data ss:Type="Number">{{ (int) ($labaBersih ?? $totalPendapatan) }}</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="KpiValueProfit"><Data ss:Type="Number">{{ (int) ($labaBersih ?? $totalPendapatan) }}</Data></Cell>
     <Cell ss:MergeAcross="1" ss:StyleID="KpiValue"><Data ss:Type="Number">{{ $totalTransaksi }}</Data></Cell>
     <Cell ss:MergeAcross="1" ss:StyleID="KpiValue"><Data ss:Type="Number">{{ $tiketSelesai }}</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="KpiValue"><Data ss:Type="Number">{{ $tiketBatal }}</Data></Cell>
    </Row>
    <Row ss:Height="12"></Row>
 
@@ -305,6 +308,7 @@
     <Cell ss:StyleID="ColHeader"><Data ss:Type="String">Tarif</Data></Cell>
     <Cell ss:StyleID="ColHeader"><Data ss:Type="String">Diskon</Data></Cell>
     <Cell ss:StyleID="ColHeader"><Data ss:Type="String">Total Bayar</Data></Cell>
+    <Cell ss:StyleID="ColHeader"><Data ss:Type="String">Pembayaran</Data></Cell>
     <Cell ss:StyleID="ColHeader"><Data ss:Type="String">Status</Data></Cell>
     <Cell ss:StyleID="ColHeader"><Data ss:Type="String">Waktu Scan / Boarding</Data></Cell>
    </Row>
@@ -327,6 +331,7 @@
      <Cell ss:StyleID="CellCurrency"><Data ss:Type="Number">{{ (int) $tiket->tarif }}</Data></Cell>
      <Cell ss:StyleID="CellCurrency"><Data ss:Type="Number">{{ (int) $tiket->diskon }}</Data></Cell>
      <Cell ss:StyleID="{{ $isBatal ? 'CellCurrencyBatal' : 'CellCurrencyBold' }}"><Data ss:Type="Number">{{ (int) $tiket->total_bayar }}</Data></Cell>
+     <Cell ss:StyleID="CellCenter"><Data ss:Type="String">{{ $tiket->metode_pembayaran_label }}</Data></Cell>
      <Cell ss:StyleID="{{ $isBatal ? 'BadgeBatal' : ($isSelesai ? 'BadgeSelesai' : 'BadgePending') }}">
       <Data ss:Type="String">{{ $isBatal ? 'Dibatalkan' : ($isSelesai ? 'Sudah Digunakan' : 'Belum Digunakan') }}</Data>
      </Cell>
@@ -334,25 +339,35 @@
     </Row>
    @empty
     <Row ss:Height="24">
-     <Cell ss:MergeAcross="12" ss:StyleID="CellCenter"><Data ss:Type="String">Tidak ada data transaksi pada periode ini.</Data></Cell>
+     <Cell ss:MergeAcross="13" ss:StyleID="CellCenter"><Data ss:Type="String">Tidak ada data transaksi pada periode ini.</Data></Cell>
     </Row>
    @endforelse
 
    {{-- Baris Grand Total di Bawah --}}
    <Row ss:Height="22">
+    <Cell ss:MergeAcross="9" ss:StyleID="TotalLabel"><Data ss:Type="String">TOTAL PEMBAYARAN TUNAI :</Data></Cell>
+    <Cell ss:StyleID="TotalValue"><Data ss:Type="Number">{{ (int) ($pendapatanTunai ?? 0) }}</Data></Cell>
+    <Cell ss:MergeAcross="2" ss:StyleID="TotalLabel"></Cell>
+   </Row>
+   <Row ss:Height="22">
+    <Cell ss:MergeAcross="9" ss:StyleID="TotalLabel"><Data ss:Type="String">TOTAL PEMBAYARAN QRIS :</Data></Cell>
+    <Cell ss:StyleID="TotalValue"><Data ss:Type="Number">{{ (int) ($pendapatanQris ?? 0) }}</Data></Cell>
+    <Cell ss:MergeAcross="2" ss:StyleID="TotalLabel"></Cell>
+   </Row>
+   <Row ss:Height="22">
     <Cell ss:MergeAcross="9" ss:StyleID="TotalLabel"><Data ss:Type="String">TOTAL PEMASUKAN TIKET :</Data></Cell>
     <Cell ss:StyleID="TotalValue"><Data ss:Type="Number">{{ (int) $totalPendapatan }}</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="TotalLabel"></Cell>
+    <Cell ss:MergeAcross="2" ss:StyleID="TotalLabel"></Cell>
    </Row>
    <Row ss:Height="22">
     <Cell ss:MergeAcross="9" ss:StyleID="TotalLabel"><Data ss:Type="String">TOTAL PENGELUARAN :</Data></Cell>
     <Cell ss:StyleID="KpiValueExpense"><Data ss:Type="Number">{{ (int) ($totalPengeluaran ?? 0) }}</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="TotalLabel"></Cell>
+    <Cell ss:MergeAcross="2" ss:StyleID="TotalLabel"></Cell>
    </Row>
    <Row ss:Height="24">
     <Cell ss:MergeAcross="9" ss:StyleID="TotalLabel"><Data ss:Type="String">LABA BERSIH (PEMASUKAN - PENGELUARAN) :</Data></Cell>
     <Cell ss:StyleID="KpiValueProfit"><Data ss:Type="Number">{{ (int) ($labaBersih ?? $totalPendapatan) }}</Data></Cell>
-    <Cell ss:MergeAcross="1" ss:StyleID="TotalLabel"></Cell>
+    <Cell ss:MergeAcross="2" ss:StyleID="TotalLabel"></Cell>
    </Row>
   </Table>
   <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
