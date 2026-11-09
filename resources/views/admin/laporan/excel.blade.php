@@ -264,7 +264,7 @@
    </Row>
    <Row ss:Height="18">
     <Cell ss:MergeAcross="13" ss:StyleID="DocSubtitle">
-     <Data ss:Type="String">Periode: {{ $namaBulan[$bulan] ?? $bulan }} {{ $tahun }} {{ $filterDesc ? '• '.$filterDesc : '' }}</Data>
+     <Data ss:Type="String">Periode: {{ $periodeLabel ?? 'Semua Periode' }} {{ $filterDesc ? '• '.$filterDesc : '' }}</Data>
     </Cell>
    </Row>
    <Row ss:Height="16">
@@ -412,7 +412,7 @@
    </Row>
    <Row ss:Height="18">
     <Cell ss:MergeAcross="6" ss:StyleID="DocSubtitle">
-     <Data ss:Type="String">Periode: {{ $namaBulan[$bulan] ?? $bulan }} {{ $tahun }}</Data>
+     <Data ss:Type="String">Periode: {{ $periodeLabel ?? 'Semua Periode' }}</Data>
     </Cell>
    </Row>
    <Row ss:Height="12"></Row>

@@ -26,18 +26,13 @@
     </x-slot>
 
     @php
-        $namaBulan = [
-            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
-        ];
         $hasDateFilter = !empty($tanggalMulai) || !empty($tanggalSelesai);
         if ($hasDateFilter) {
             $startLabel = !empty($tanggalMulai) ? \Illuminate\Support\Carbon::parse($tanggalMulai)->format('d M Y') : 'Awal';
             $endLabel = !empty($tanggalSelesai) ? \Illuminate\Support\Carbon::parse($tanggalSelesai)->format('d M Y') : 'Sekarang';
             $periodeTeks = "{$startLabel} s/d {$endLabel}";
         } else {
-            $periodeTeks = ($namaBulan[$bulan] ?? $bulan) . ' ' . $tahun;
+            $periodeTeks = 'Semua Periode';
         }
     @endphp
 
@@ -53,7 +48,7 @@
 
     {{-- Filter Form --}}
     <div class="bg-white rounded-3xl p-5 sm:p-6 border border-slate-100 shadow-xs mb-6">
-        <form method="GET" action="{{ route('admin.laporan.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 items-end">
+        <form method="GET" action="{{ route('admin.laporan.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3.5 items-end">
             {{-- Filter Dari Tanggal --}}
             <div>
                 <label for="tanggal_mulai" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
@@ -70,36 +65,6 @@
                 </label>
                 <input type="date" name="tanggal_selesai" id="tanggal_selesai" value="{{ $tanggalSelesai ?? '' }}"
                     class="w-full text-xs sm:text-sm font-medium rounded-2xl border-slate-200 bg-slate-50/70 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 py-2.5 px-3.5 transition" />
-            </div>
-
-            {{-- Filter Bulan --}}
-            <div>
-                <label for="bulan" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
-                    <i class="fa-regular fa-calendar mr-1 text-slate-400"></i> Bulan <span class="text-[10px] font-normal text-slate-400 normal-case">(jika tanpa tgl)</span>
-                </label>
-                <select name="bulan" id="bulan"
-                    class="w-full text-xs sm:text-sm font-medium rounded-2xl border-slate-200 bg-slate-50/70 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 py-2.5 transition">
-                    @foreach ($namaBulan as $num => $nama)
-                        <option value="{{ $num }}" {{ (int) $bulan === $num ? 'selected' : '' }}>
-                            {{ $nama }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            {{-- Filter Tahun --}}
-            <div>
-                <label for="tahun" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
-                    <i class="fa-regular fa-calendar-days mr-1 text-slate-400"></i> Tahun
-                </label>
-                <select name="tahun" id="tahun"
-                    class="w-full text-xs sm:text-sm font-medium rounded-2xl border-slate-200 bg-slate-50/70 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 py-2.5 transition">
-                    @foreach ($daftarTahun as $th)
-                        <option value="{{ $th }}" {{ (int) $tahun === $th ? 'selected' : '' }}>
-                            {{ $th }}
-                        </option>
-                    @endforeach
-                </select>
             </div>
 
             {{-- Filter Wahana --}}
@@ -155,7 +120,7 @@
                 </button>
                 <a href="{{ route('admin.laporan.index') }}"
                     class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-2xl transition"
-                    title="Reset Filter ke Bulan Ini">
+                    title="Reset Filter">
                     <i class="fa-solid fa-rotate-left"></i>
                 </a>
             </div>
@@ -192,7 +157,7 @@
                 <p class="text-xl sm:text-2xl font-black text-rose-600 tracking-tight mt-1">
                     Rp {{ number_format($totalPengeluaran ?? 0, 0, ',', '.') }}
                 </p>
-                <a href="{{ route('admin.pengeluaran.index', $hasDateFilter ? ['tanggal_mulai' => $tanggalMulai, 'tanggal_selesai' => $tanggalSelesai] : ['bulan' => $bulan, 'tahun' => $tahun]) }}"
+                <a href="{{ route('admin.pengeluaran.index', $hasDateFilter ? ['tanggal_mulai' => $tanggalMulai, 'tanggal_selesai' => $tanggalSelesai] : []) }}"
                     class="text-[11px] text-rose-600 font-semibold hover:underline mt-0.5 inline-block">
                     Lihat Rincian Pengeluaran &rarr;
                 </a>

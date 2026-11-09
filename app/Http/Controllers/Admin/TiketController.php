@@ -29,6 +29,10 @@ class TiketController extends Controller
         $tanggalMulai = $request->input('tanggal_mulai');
         $tanggalSelesai = $request->input('tanggal_selesai');
 
+        if ($tanggalMulai && $tanggalSelesai && $tanggalMulai > $tanggalSelesai) {
+            [$tanggalMulai, $tanggalSelesai] = [$tanggalSelesai, $tanggalMulai];
+        }
+
         $query = Tiket::with('kapal');
 
         if ($request->filled('search')) {
@@ -45,11 +49,11 @@ class TiketController extends Controller
             });
         }
 
-        if ($request->filled('tanggal_mulai')) {
+        if (! empty($tanggalMulai)) {
             $query->whereDate('tanggal_pemesanan', '>=', $tanggalMulai);
         }
 
-        if ($request->filled('tanggal_selesai')) {
+        if (! empty($tanggalSelesai)) {
             $query->whereDate('tanggal_pemesanan', '<=', $tanggalSelesai);
         }
 

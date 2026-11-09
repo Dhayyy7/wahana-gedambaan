@@ -17,31 +17,26 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class PengeluaranController extends Controller
 {
     /**
-     * Daftar catatan pengeluaran dengan filter rentang tanggal, bulan, tahun, dan pencarian.
+     * Daftar catatan pengeluaran dengan filter rentang tanggal dan pencarian.
      */
     public function index(Request $request): View
     {
-        $bulan = $request->input('bulan', (string) now()->month);
-        $tahun = (int) $request->input('tahun', now()->year);
         $search = $request->input('search');
         $tanggalMulai = $request->input('tanggal_mulai');
         $tanggalSelesai = $request->input('tanggal_selesai');
 
+        if ($tanggalMulai && $tanggalSelesai && $tanggalMulai > $tanggalSelesai) {
+            [$tanggalMulai, $tanggalSelesai] = [$tanggalSelesai, $tanggalMulai];
+        }
+
         $baseQuery = Pengeluaran::with('user');
 
-        if ($request->filled('tanggal_mulai') || $request->filled('tanggal_selesai')) {
-            if ($request->filled('tanggal_mulai')) {
-                $baseQuery->whereDate('tanggal_pengeluaran', '>=', $tanggalMulai);
-            }
-            if ($request->filled('tanggal_selesai')) {
-                $baseQuery->whereDate('tanggal_pengeluaran', '<=', $tanggalSelesai);
-            }
-        } else {
-            $baseQuery->whereYear('tanggal_pengeluaran', $tahun);
+        if (! empty($tanggalMulai)) {
+            $baseQuery->whereDate('tanggal_pengeluaran', '>=', $tanggalMulai);
+        }
 
-            if ($bulan !== 'all' && $bulan !== '' && $bulan !== null) {
-                $baseQuery->whereMonth('tanggal_pengeluaran', (int) $bulan);
-            }
+        if (! empty($tanggalSelesai)) {
+            $baseQuery->whereDate('tanggal_pengeluaran', '<=', $tanggalSelesai);
         }
 
         if ($request->filled('search')) {
@@ -65,23 +60,15 @@ class PengeluaranController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        $tahunAwal = Pengeluaran::min('tanggal_pengeluaran');
-        $tahunMin = $tahunAwal ? (int) date('Y', strtotime((string) $tahunAwal)) : now()->year;
-        $tahunMax = now()->year + 1;
-        $daftarTahun = range(max($tahunMin, now()->year - 5), $tahunMax);
-
         return view('admin.pengeluaran.index', compact(
             'pengeluarans',
-            'bulan',
-            'tahun',
             'search',
             'tanggalMulai',
             'tanggalSelesai',
             'totalCatatan',
             'totalPengeluaran',
             'pengeluaranTerbesar',
-            'pengeluaranHariIni',
-            'daftarTahun'
+            'pengeluaranHariIni'
         ));
     }
 
@@ -171,27 +158,22 @@ class PengeluaranController extends Controller
      */
     public function exportExcel(Request $request): Response
     {
-        $bulan = $request->input('bulan', (string) now()->month);
-        $tahun = (int) $request->input('tahun', now()->year);
         $search = $request->input('search');
         $tanggalMulai = $request->input('tanggal_mulai');
         $tanggalSelesai = $request->input('tanggal_selesai');
 
+        if ($tanggalMulai && $tanggalSelesai && $tanggalMulai > $tanggalSelesai) {
+            [$tanggalMulai, $tanggalSelesai] = [$tanggalSelesai, $tanggalMulai];
+        }
+
         $query = Pengeluaran::with('user');
 
-        if ($request->filled('tanggal_mulai') || $request->filled('tanggal_selesai')) {
-            if ($request->filled('tanggal_mulai')) {
-                $query->whereDate('tanggal_pengeluaran', '>=', $tanggalMulai);
-            }
-            if ($request->filled('tanggal_selesai')) {
-                $query->whereDate('tanggal_pengeluaran', '<=', $tanggalSelesai);
-            }
-        } else {
-            $query->whereYear('tanggal_pengeluaran', $tahun);
+        if (! empty($tanggalMulai)) {
+            $query->whereDate('tanggal_pengeluaran', '>=', $tanggalMulai);
+        }
 
-            if ($bulan !== 'all' && $bulan !== '' && $bulan !== null) {
-                $query->whereMonth('tanggal_pengeluaran', (int) $bulan);
-            }
+        if (! empty($tanggalSelesai)) {
+            $query->whereDate('tanggal_pengeluaran', '<=', $tanggalSelesai);
         }
 
         if ($request->filled('search')) {
@@ -213,30 +195,22 @@ class PengeluaranController extends Controller
             ->orderBy('id', 'asc')
             ->get();
 
-        $namaBulan = [
-            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
-        ];
-
-        if ($request->filled('tanggal_mulai') || $request->filled('tanggal_selesai')) {
-            $startFmt = $request->filled('tanggal_mulai') ? Carbon::parse($tanggalMulai)->format('d M Y') : 'Awal';
-            $endFmt = $request->filled('tanggal_selesai') ? Carbon::parse($tanggalSelesai)->format('d M Y') : 'Sekarang';
+        if (! empty($tanggalMulai) || ! empty($tanggalSelesai)) {
+            $startFmt = ! empty($tanggalMulai) ? Carbon::parse($tanggalMulai)->format('d M Y') : 'Awal';
+            $endFmt = ! empty($tanggalSelesai) ? Carbon::parse($tanggalSelesai)->format('d M Y') : 'Sekarang';
             $periodeLabel = "{$startFmt} s/d {$endFmt}";
         } else {
-            $periodeLabel = ($bulan !== 'all' && isset($namaBulan[(int) $bulan]))
-                ? $namaBulan[(int) $bulan].' '.$tahun
-                : 'Semua Bulan '.$tahun;
+            $periodeLabel = 'Semua Periode';
         }
 
-        $bulanStr = $bulan !== 'all' ? str_pad((string) $bulan, 2, '0', STR_PAD_LEFT) : 'all';
-        $filename = "laporan-pengeluaran-gedambaan-{$tahun}-{$bulanStr}.xls";
+        $bulanStr = now()->format('m');
+        $tahun = now()->year;
+        $filename = 'laporan-pengeluaran-gedambaan-'.now()->format('Ymd').'.xls';
 
         $xml = view('admin.pengeluaran.excel', compact(
             'pengeluarans',
-            'bulan',
-            'tahun',
             'bulanStr',
+            'tahun',
             'periodeLabel',
             'totalCatatan',
             'totalPengeluaran',
@@ -255,27 +229,22 @@ class PengeluaranController extends Controller
      */
     public function exportCsv(Request $request): StreamedResponse
     {
-        $bulan = $request->input('bulan', (string) now()->month);
-        $tahun = (int) $request->input('tahun', now()->year);
         $search = $request->input('search');
         $tanggalMulai = $request->input('tanggal_mulai');
         $tanggalSelesai = $request->input('tanggal_selesai');
 
+        if ($tanggalMulai && $tanggalSelesai && $tanggalMulai > $tanggalSelesai) {
+            [$tanggalMulai, $tanggalSelesai] = [$tanggalSelesai, $tanggalMulai];
+        }
+
         $query = Pengeluaran::with('user');
 
-        if ($request->filled('tanggal_mulai') || $request->filled('tanggal_selesai')) {
-            if ($request->filled('tanggal_mulai')) {
-                $query->whereDate('tanggal_pengeluaran', '>=', $tanggalMulai);
-            }
-            if ($request->filled('tanggal_selesai')) {
-                $query->whereDate('tanggal_pengeluaran', '<=', $tanggalSelesai);
-            }
-        } else {
-            $query->whereYear('tanggal_pengeluaran', $tahun);
+        if (! empty($tanggalMulai)) {
+            $query->whereDate('tanggal_pengeluaran', '>=', $tanggalMulai);
+        }
 
-            if ($bulan !== 'all' && $bulan !== '' && $bulan !== null) {
-                $query->whereMonth('tanggal_pengeluaran', (int) $bulan);
-            }
+        if (! empty($tanggalSelesai)) {
+            $query->whereDate('tanggal_pengeluaran', '<=', $tanggalSelesai);
         }
 
         if ($request->filled('search')) {
@@ -287,24 +256,15 @@ class PengeluaranController extends Controller
             });
         }
 
-        $namaBulan = [
-            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
-        ];
-
-        if ($request->filled('tanggal_mulai') || $request->filled('tanggal_selesai')) {
-            $startFmt = $request->filled('tanggal_mulai') ? Carbon::parse($tanggalMulai)->format('d M Y') : 'Awal';
-            $endFmt = $request->filled('tanggal_selesai') ? Carbon::parse($tanggalSelesai)->format('d M Y') : 'Sekarang';
+        if (! empty($tanggalMulai) || ! empty($tanggalSelesai)) {
+            $startFmt = ! empty($tanggalMulai) ? Carbon::parse($tanggalMulai)->format('d M Y') : 'Awal';
+            $endFmt = ! empty($tanggalSelesai) ? Carbon::parse($tanggalSelesai)->format('d M Y') : 'Sekarang';
             $periodeLabel = "{$startFmt} s/d {$endFmt}";
         } else {
-            $periodeLabel = ($bulan !== 'all' && isset($namaBulan[(int) $bulan]))
-                ? $namaBulan[(int) $bulan].' '.$tahun
-                : 'Semua Bulan '.$tahun;
+            $periodeLabel = 'Semua Periode';
         }
 
-        $bulanStr = $bulan !== 'all' ? str_pad((string) $bulan, 2, '0', STR_PAD_LEFT) : 'all';
-        $filename = "laporan-pengeluaran-gedambaan-{$tahun}-{$bulanStr}.csv";
+        $filename = 'laporan-pengeluaran-gedambaan-'.now()->format('Ymd').'.csv';
 
         return response()->streamDownload(function () use ($query, $periodeLabel) {
             $handle = fopen('php://output', 'w');

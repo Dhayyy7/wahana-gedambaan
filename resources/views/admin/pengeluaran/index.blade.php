@@ -35,20 +35,13 @@
     </x-slot>
 
     @php
-        $namaBulan = [
-            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
-        ];
         $hasDateFilter = !empty($tanggalMulai) || !empty($tanggalSelesai);
         if ($hasDateFilter) {
             $startLabel = !empty($tanggalMulai) ? \Illuminate\Support\Carbon::parse($tanggalMulai)->format('d M Y') : 'Awal';
             $endLabel = !empty($tanggalSelesai) ? \Illuminate\Support\Carbon::parse($tanggalSelesai)->format('d M Y') : 'Sekarang';
             $periodeTeks = "{$startLabel} s/d {$endLabel}";
         } else {
-            $periodeTeks = ($bulan !== 'all' && isset($namaBulan[(int) $bulan]))
-                ? $namaBulan[(int) $bulan] . ' ' . $tahun
-                : 'Semua Bulan ' . $tahun;
+            $periodeTeks = 'Semua Periode';
         }
     @endphp
 
@@ -127,9 +120,9 @@
 
     {{-- Filter & Search Bar --}}
     <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-xs mb-6">
-        <form method="GET" action="{{ route('admin.pengeluaran.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3.5 items-end">
+        <form method="GET" action="{{ route('admin.pengeluaran.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 items-end">
             {{-- Pencarian --}}
-            <div class="lg:col-span-2">
+            <div class="sm:col-span-2">
                 <label for="search" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
                     <i class="fa-solid fa-magnifying-glass mr-1 text-slate-400"></i> Cari Pengeluaran
                 </label>
@@ -156,49 +149,21 @@
                     class="w-full text-xs sm:text-sm font-medium rounded-2xl border-slate-200 bg-slate-50/70 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 py-2.5 px-3.5 transition" />
             </div>
 
-            {{-- Filter Bulan --}}
-            <div>
-                <label for="bulan" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
-                    <i class="fa-regular fa-calendar mr-1 text-slate-400"></i> Bulan
-                </label>
-                <select name="bulan" id="bulan"
-                    class="w-full text-xs sm:text-sm font-medium rounded-2xl border-slate-200 bg-slate-50/70 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 py-2.5 transition">
-                    <option value="all" {{ (string) $bulan === 'all' ? 'selected' : '' }}>Semua Bulan</option>
-                    @foreach ($namaBulan as $num => $nama)
-                        <option value="{{ $num }}" {{ (string) $bulan === (string) $num ? 'selected' : '' }}>
-                            {{ $nama }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            {{-- Filter Tahun & Tombol --}}
-            <div class="flex items-end gap-2">
-                <div class="flex-1">
-                    <label for="tahun" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
-                        <i class="fa-regular fa-calendar-days mr-1 text-slate-400"></i> Tahun
-                    </label>
-                    <select name="tahun" id="tahun"
-                        class="w-full text-xs sm:text-sm font-medium rounded-2xl border-slate-200 bg-slate-50/70 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 py-2.5 transition">
-                        @foreach ($daftarTahun as $th)
-                            <option value="{{ $th }}" {{ (int) $tahun === $th ? 'selected' : '' }}>
-                                {{ $th }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+            {{-- Tombol Terapkan & Reset --}}
+            <div class="flex items-center gap-2">
                 <button type="submit"
                     style="background-color: #2563eb; color: #ffffff;"
-                    class="py-2.5 px-4 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-sm shadow-blue-200 transition flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
-                    title="Terapkan Filter">
+                    class="flex-1 py-2.5 px-4 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-sm shadow-blue-200 transition flex items-center justify-center gap-2 cursor-pointer">
                     <i class="fa-solid fa-filter"></i>
-                    <span>Cari</span>
+                    <span>Terapkan</span>
                 </button>
-                <a href="{{ route('admin.pengeluaran.index') }}"
-                    class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-2xl transition shrink-0"
-                    title="Reset Filter">
-                    <i class="fa-solid fa-rotate-left"></i>
-                </a>
+                @if (!empty($search) || !empty($tanggalMulai) || !empty($tanggalSelesai))
+                    <a href="{{ route('admin.pengeluaran.index') }}"
+                        class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-2xl transition shrink-0"
+                        title="Reset Filter">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </a>
+                @endif
             </div>
         </form>
     </div>

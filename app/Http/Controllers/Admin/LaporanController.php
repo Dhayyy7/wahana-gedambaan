@@ -15,32 +15,30 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class LaporanController extends Controller
 {
     /**
-     * Halaman laporan transaksi bulanan / rentang tanggal dengan filter periode, wahana, pembayaran, dan status.
+     * Halaman laporan transaksi dengan filter rentang tanggal, wahana, pembayaran, dan status.
      */
     public function index(Request $request): View
     {
         Tiket::syncExpiredTickets();
 
-        $bulan = (int) $request->input('bulan', now()->month);
-        $tahun = (int) $request->input('tahun', now()->year);
         $kapalId = $request->input('kapal_id', 'all');
         $status = $request->input('status', 'all');
         $metodePembayaran = $request->input('metode_pembayaran', 'all');
         $tanggalMulai = $request->input('tanggal_mulai');
         $tanggalSelesai = $request->input('tanggal_selesai');
 
+        if ($tanggalMulai && $tanggalSelesai && $tanggalMulai > $tanggalSelesai) {
+            [$tanggalMulai, $tanggalSelesai] = [$tanggalSelesai, $tanggalMulai];
+        }
+
         $baseQuery = Tiket::with('kapal');
 
-        if ($request->filled('tanggal_mulai') || $request->filled('tanggal_selesai')) {
-            if ($request->filled('tanggal_mulai')) {
-                $baseQuery->whereDate('tanggal_pemesanan', '>=', $tanggalMulai);
-            }
-            if ($request->filled('tanggal_selesai')) {
-                $baseQuery->whereDate('tanggal_pemesanan', '<=', $tanggalSelesai);
-            }
-        } else {
-            $baseQuery->whereMonth('tanggal_pemesanan', $bulan)
-                ->whereYear('tanggal_pemesanan', $tahun);
+        if (! empty($tanggalMulai)) {
+            $baseQuery->whereDate('tanggal_pemesanan', '>=', $tanggalMulai);
+        }
+
+        if (! empty($tanggalSelesai)) {
+            $baseQuery->whereDate('tanggal_pemesanan', '<=', $tanggalSelesai);
         }
 
         if ($kapalId !== 'all' && $kapalId !== '' && $kapalId !== null) {
@@ -70,16 +68,11 @@ class LaporanController extends Controller
 
         // Rekap pengeluaran periode terpilih & laba bersih
         $pengeluaranQuery = Pengeluaran::query();
-        if ($request->filled('tanggal_mulai') || $request->filled('tanggal_selesai')) {
-            if ($request->filled('tanggal_mulai')) {
-                $pengeluaranQuery->whereDate('tanggal_pengeluaran', '>=', $tanggalMulai);
-            }
-            if ($request->filled('tanggal_selesai')) {
-                $pengeluaranQuery->whereDate('tanggal_pengeluaran', '<=', $tanggalSelesai);
-            }
-        } else {
-            $pengeluaranQuery->whereMonth('tanggal_pengeluaran', $bulan)
-                ->whereYear('tanggal_pengeluaran', $tahun);
+        if (! empty($tanggalMulai)) {
+            $pengeluaranQuery->whereDate('tanggal_pengeluaran', '>=', $tanggalMulai);
+        }
+        if (! empty($tanggalSelesai)) {
+            $pengeluaranQuery->whereDate('tanggal_pengeluaran', '<=', $tanggalSelesai);
         }
         $totalPengeluaran = (float) $pengeluaranQuery->sum('nominal');
         $labaBersih = $totalPendapatan - $totalPengeluaran;
@@ -92,17 +85,9 @@ class LaporanController extends Controller
 
         $kapals = Kapal::orderBy('nama_kapal')->get(['id', 'nama_kapal', 'kode_kapal']);
 
-        // Daftar tahun untuk opsi dropdown (dari tahun tertua tiket hingga tahun sekarang + 1)
-        $tahunAwal = Tiket::min('tanggal_pemesanan');
-        $tahunMin = $tahunAwal ? (int) date('Y', strtotime($tahunAwal)) : now()->year;
-        $tahunMax = now()->year + 1;
-        $daftarTahun = range(max($tahunMin, now()->year - 5), $tahunMax);
-
         return view('admin.laporan.index', compact(
             'tikets',
             'kapals',
-            'bulan',
-            'tahun',
             'kapalId',
             'status',
             'metodePembayaran',
@@ -117,44 +102,44 @@ class LaporanController extends Controller
             'totalDiskon',
             'tiketSelesai',
             'tiketPending',
-            'tiketBatal',
-            'daftarTahun'
+            'tiketBatal'
         ));
     }
 
     /**
-     * Export laporan bulanan langsung ke format Microsoft Excel (.xls / SpreadsheetML)
+     * Export laporan langsung ke format Microsoft Excel (.xls / SpreadsheetML)
      * lengkap dengan styling tabel, warna, border, lebar kolom, dan format angka mata uang.
      */
     public function exportExcel(Request $request): Response
     {
         Tiket::syncExpiredTickets();
 
-        $bulan = (int) $request->input('bulan', now()->month);
-        $tahun = (int) $request->input('tahun', now()->year);
         $kapalId = $request->input('kapal_id', 'all');
         $status = $request->input('status', 'all');
         $metodePembayaran = $request->input('metode_pembayaran', 'all');
         $tanggalMulai = $request->input('tanggal_mulai');
         $tanggalSelesai = $request->input('tanggal_selesai');
 
+        if ($tanggalMulai && $tanggalSelesai && $tanggalMulai > $tanggalSelesai) {
+            [$tanggalMulai, $tanggalSelesai] = [$tanggalSelesai, $tanggalMulai];
+        }
+
         $query = Tiket::with('kapal');
 
         $filterParts = [];
 
-        if ($request->filled('tanggal_mulai') || $request->filled('tanggal_selesai')) {
-            if ($request->filled('tanggal_mulai')) {
+        if (! empty($tanggalMulai) || ! empty($tanggalSelesai)) {
+            if (! empty($tanggalMulai)) {
                 $query->whereDate('tanggal_pemesanan', '>=', $tanggalMulai);
             }
-            if ($request->filled('tanggal_selesai')) {
+            if (! empty($tanggalSelesai)) {
                 $query->whereDate('tanggal_pemesanan', '<=', $tanggalSelesai);
             }
-            $startFmt = $request->filled('tanggal_mulai') ? Carbon::parse($tanggalMulai)->format('d M Y') : 'Awal';
-            $endFmt = $request->filled('tanggal_selesai') ? Carbon::parse($tanggalSelesai)->format('d M Y') : 'Sekarang';
-            $filterParts[] = "Tanggal: {$startFmt} s/d {$endFmt}";
+            $startFmt = ! empty($tanggalMulai) ? Carbon::parse($tanggalMulai)->format('d M Y') : 'Awal';
+            $endFmt = ! empty($tanggalSelesai) ? Carbon::parse($tanggalSelesai)->format('d M Y') : 'Sekarang';
+            $periodeLabel = "{$startFmt} s/d {$endFmt}";
         } else {
-            $query->whereMonth('tanggal_pemesanan', $bulan)
-                ->whereYear('tanggal_pemesanan', $tahun);
+            $periodeLabel = 'Semua Periode';
         }
 
         if ($kapalId !== 'all' && $kapalId !== '' && $kapalId !== null) {
@@ -198,16 +183,11 @@ class LaporanController extends Controller
         $tiketBatal = (clone $statsQuery)->where('status', Tiket::STATUS_BATAL)->count();
 
         $pengeluaranQuery = Pengeluaran::with('user');
-        if ($request->filled('tanggal_mulai') || $request->filled('tanggal_selesai')) {
-            if ($request->filled('tanggal_mulai')) {
-                $pengeluaranQuery->whereDate('tanggal_pengeluaran', '>=', $tanggalMulai);
-            }
-            if ($request->filled('tanggal_selesai')) {
-                $pengeluaranQuery->whereDate('tanggal_pengeluaran', '<=', $tanggalSelesai);
-            }
-        } else {
-            $pengeluaranQuery->whereMonth('tanggal_pengeluaran', $bulan)
-                ->whereYear('tanggal_pengeluaran', $tahun);
+        if (! empty($tanggalMulai)) {
+            $pengeluaranQuery->whereDate('tanggal_pengeluaran', '>=', $tanggalMulai);
+        }
+        if (! empty($tanggalSelesai)) {
+            $pengeluaranQuery->whereDate('tanggal_pengeluaran', '<=', $tanggalSelesai);
         }
         $pengeluarans = $pengeluaranQuery
             ->orderBy('tanggal_pengeluaran', 'asc')
@@ -218,14 +198,15 @@ class LaporanController extends Controller
 
         $tikets = $query->orderBy('tanggal_pemesanan', 'asc')->get();
 
+        $bulan = now()->month;
+        $tahun = now()->year;
+        $bulanStr = now()->format('m');
         $namaBulan = [
             1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
             5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
             9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
         ];
-
-        $bulanStr = str_pad((string) $bulan, 2, '0', STR_PAD_LEFT);
-        $filename = "laporan-transaksi-gedambaan-{$tahun}-{$bulanStr}.xls";
+        $filename = 'laporan-transaksi-gedambaan-'.now()->format('Ymd').'.xls';
 
         $xml = view('admin.laporan.excel', compact(
             'tikets',
@@ -234,6 +215,7 @@ class LaporanController extends Controller
             'tahun',
             'bulanStr',
             'namaBulan',
+            'periodeLabel',
             'filterDesc',
             'totalTransaksi',
             'totalPendapatan',
@@ -255,33 +237,37 @@ class LaporanController extends Controller
     }
 
     /**
-     * Export laporan bulanan ke file CSV dengan separator titik koma (;) dan UTF-8 BOM
+     * Export laporan ke file CSV dengan separator titik koma (;) dan UTF-8 BOM
      * agar kompatibel dengan Excel pada regional setting Indonesia.
      */
     public function exportCsv(Request $request): StreamedResponse
     {
         Tiket::syncExpiredTickets();
 
-        $bulan = (int) $request->input('bulan', now()->month);
-        $tahun = (int) $request->input('tahun', now()->year);
         $kapalId = $request->input('kapal_id', 'all');
         $status = $request->input('status', 'all');
         $metodePembayaran = $request->input('metode_pembayaran', 'all');
         $tanggalMulai = $request->input('tanggal_mulai');
         $tanggalSelesai = $request->input('tanggal_selesai');
 
+        if ($tanggalMulai && $tanggalSelesai && $tanggalMulai > $tanggalSelesai) {
+            [$tanggalMulai, $tanggalSelesai] = [$tanggalSelesai, $tanggalMulai];
+        }
+
         $query = Tiket::with('kapal');
 
-        if ($request->filled('tanggal_mulai') || $request->filled('tanggal_selesai')) {
-            if ($request->filled('tanggal_mulai')) {
+        if (! empty($tanggalMulai) || ! empty($tanggalSelesai)) {
+            if (! empty($tanggalMulai)) {
                 $query->whereDate('tanggal_pemesanan', '>=', $tanggalMulai);
             }
-            if ($request->filled('tanggal_selesai')) {
+            if (! empty($tanggalSelesai)) {
                 $query->whereDate('tanggal_pemesanan', '<=', $tanggalSelesai);
             }
+            $startFmt = ! empty($tanggalMulai) ? Carbon::parse($tanggalMulai)->format('d M Y') : 'Awal';
+            $endFmt = ! empty($tanggalSelesai) ? Carbon::parse($tanggalSelesai)->format('d M Y') : 'Sekarang';
+            $periodeLabel = "{$startFmt} s/d {$endFmt}";
         } else {
-            $query->whereMonth('tanggal_pemesanan', $bulan)
-                ->whereYear('tanggal_pemesanan', $tahun);
+            $periodeLabel = 'Semua Periode';
         }
 
         if ($kapalId !== 'all' && $kapalId !== '' && $kapalId !== null) {
@@ -298,16 +284,9 @@ class LaporanController extends Controller
             $query->where('metode_pembayaran', $metodePembayaran);
         }
 
-        $namaBulan = [
-            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
-        ];
+        $filename = 'laporan-transaksi-gedambaan-'.now()->format('Ymd').'.csv';
 
-        $bulanStr = str_pad((string) $bulan, 2, '0', STR_PAD_LEFT);
-        $filename = "laporan-transaksi-gedambaan-{$tahun}-{$bulanStr}.csv";
-
-        return response()->streamDownload(function () use ($query, $bulan, $tahun, $namaBulan) {
+        return response()->streamDownload(function () use ($query, $periodeLabel) {
             $handle = fopen('php://output', 'w');
 
             // UTF-8 BOM untuk Microsoft Excel
@@ -318,7 +297,7 @@ class LaporanController extends Controller
 
             // Header informasi dokumen
             fputcsv($handle, ['LAPORAN TRANSAKSI WAHANA GEDAMBAAN'], ';');
-            fputcsv($handle, ['Periode', ($namaBulan[$bulan] ?? $bulan).' '.$tahun], ';');
+            fputcsv($handle, ['Periode', $periodeLabel], ';');
             fputcsv($handle, ['Waktu Download', now()->format('d/m/Y H:i:s').' WIB'], ';');
             fputcsv($handle, [], ';');
 
