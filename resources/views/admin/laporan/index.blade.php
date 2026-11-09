@@ -31,6 +31,14 @@
             5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
             9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
         ];
+        $hasDateFilter = !empty($tanggalMulai) || !empty($tanggalSelesai);
+        if ($hasDateFilter) {
+            $startLabel = !empty($tanggalMulai) ? \Illuminate\Support\Carbon::parse($tanggalMulai)->format('d M Y') : 'Awal';
+            $endLabel = !empty($tanggalSelesai) ? \Illuminate\Support\Carbon::parse($tanggalSelesai)->format('d M Y') : 'Sekarang';
+            $periodeTeks = "{$startLabel} s/d {$endLabel}";
+        } else {
+            $periodeTeks = ($namaBulan[$bulan] ?? $bulan) . ' ' . $tahun;
+        }
     @endphp
 
     {{-- Flash Messages --}}
@@ -45,11 +53,29 @@
 
     {{-- Filter Form --}}
     <div class="bg-white rounded-3xl p-5 sm:p-6 border border-slate-100 shadow-xs mb-6">
-        <form method="GET" action="{{ route('admin.laporan.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3.5 items-end">
+        <form method="GET" action="{{ route('admin.laporan.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 items-end">
+            {{-- Filter Dari Tanggal --}}
+            <div>
+                <label for="tanggal_mulai" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
+                    <i class="fa-regular fa-calendar-check mr-1 text-blue-500"></i> Dari Tanggal
+                </label>
+                <input type="date" name="tanggal_mulai" id="tanggal_mulai" value="{{ $tanggalMulai ?? '' }}"
+                    class="w-full text-xs sm:text-sm font-medium rounded-2xl border-slate-200 bg-slate-50/70 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 py-2.5 px-3.5 transition" />
+            </div>
+
+            {{-- Filter Sampai Tanggal --}}
+            <div>
+                <label for="tanggal_selesai" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
+                    <i class="fa-regular fa-calendar-check mr-1 text-blue-500"></i> Sampai Tanggal
+                </label>
+                <input type="date" name="tanggal_selesai" id="tanggal_selesai" value="{{ $tanggalSelesai ?? '' }}"
+                    class="w-full text-xs sm:text-sm font-medium rounded-2xl border-slate-200 bg-slate-50/70 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 py-2.5 px-3.5 transition" />
+            </div>
+
             {{-- Filter Bulan --}}
             <div>
                 <label for="bulan" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
-                    <i class="fa-regular fa-calendar mr-1 text-slate-400"></i> Bulan
+                    <i class="fa-regular fa-calendar mr-1 text-slate-400"></i> Bulan <span class="text-[10px] font-normal text-slate-400 normal-case">(jika tanpa tgl)</span>
                 </label>
                 <select name="bulan" id="bulan"
                     class="w-full text-xs sm:text-sm font-medium rounded-2xl border-slate-200 bg-slate-50/70 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 py-2.5 transition">
@@ -123,7 +149,7 @@
             {{-- Action Buttons Filter --}}
             <div class="flex items-center gap-2">
                 <button type="submit"
-                    class="flex-1 py-2.5 px-4 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-sm shadow-blue-200 transition flex items-center justify-center gap-2">
+                    class="flex-1 py-2.5 px-4 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-sm shadow-blue-200 transition flex items-center justify-center gap-2 cursor-pointer">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <span>Terapkan</span>
                 </button>
@@ -166,7 +192,7 @@
                 <p class="text-xl sm:text-2xl font-black text-rose-600 tracking-tight mt-1">
                     Rp {{ number_format($totalPengeluaran ?? 0, 0, ',', '.') }}
                 </p>
-                <a href="{{ route('admin.pengeluaran.index', ['bulan' => $bulan, 'tahun' => $tahun]) }}"
+                <a href="{{ route('admin.pengeluaran.index', $hasDateFilter ? ['tanggal_mulai' => $tanggalMulai, 'tanggal_selesai' => $tanggalSelesai] : ['bulan' => $bulan, 'tahun' => $tahun]) }}"
                     class="text-[11px] text-rose-600 font-semibold hover:underline mt-0.5 inline-block">
                     Lihat Rincian Pengeluaran &rarr;
                 </a>
@@ -187,7 +213,7 @@
                     Rp {{ number_format($nilaiLaba, 0, ',', '.') }}
                 </p>
                 <p class="text-[11px] text-slate-400 mt-0.5">
-                    Rekap bersih {{ $namaBulan[$bulan] ?? $bulan }} {{ $tahun }}
+                    Rekap bersih {{ $periodeTeks }}
                 </p>
             </div>
             <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg shrink-0">
@@ -261,7 +287,7 @@
             <div>
                 <h2 class="text-base font-bold text-slate-800">Rincian Transaksi</h2>
                 <p class="text-xs text-slate-400 mt-0.5">
-                    Menampilkan transaksi bulan <strong class="text-slate-700">{{ $namaBulan[$bulan] ?? $bulan }} {{ $tahun }}</strong>
+                    Menampilkan transaksi periode <strong class="text-slate-700">{{ $periodeTeks }}</strong>
                     @if ($kapalId !== 'all')
                         • Wahana: <strong class="text-slate-700">{{ $kapals->firstWhere('id', $kapalId)?->nama_kapal }}</strong>
                     @endif

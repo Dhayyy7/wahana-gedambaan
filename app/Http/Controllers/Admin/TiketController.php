@@ -26,6 +26,8 @@ class TiketController extends Controller
         $search = $request->input('search');
         $status = $request->input('status', 'all');
         $metodePembayaran = $request->input('metode_pembayaran', 'all');
+        $tanggalMulai = $request->input('tanggal_mulai');
+        $tanggalSelesai = $request->input('tanggal_selesai');
 
         $query = Tiket::with('kapal');
 
@@ -43,6 +45,14 @@ class TiketController extends Controller
             });
         }
 
+        if ($request->filled('tanggal_mulai')) {
+            $query->whereDate('tanggal_pemesanan', '>=', $tanggalMulai);
+        }
+
+        if ($request->filled('tanggal_selesai')) {
+            $query->whereDate('tanggal_pemesanan', '<=', $tanggalSelesai);
+        }
+
         if ($status !== 'all' && $status !== '' && $status !== null) {
             $query->where('status', (int) $status);
         }
@@ -58,7 +68,14 @@ class TiketController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('admin.tiket.index', compact('tikets', 'search', 'status', 'metodePembayaran'));
+        return view('admin.tiket.index', compact(
+            'tikets',
+            'search',
+            'status',
+            'metodePembayaran',
+            'tanggalMulai',
+            'tanggalSelesai'
+        ));
     }
 
     /**

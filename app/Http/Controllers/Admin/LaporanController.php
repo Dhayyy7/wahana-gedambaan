@@ -8,13 +8,14 @@ use App\Models\Pengeluaran;
 use App\Models\Tiket;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class LaporanController extends Controller
 {
     /**
-     * Halaman laporan transaksi bulanan dengan filter periode, kapal, dan status.
+     * Halaman laporan transaksi bulanan / rentang tanggal dengan filter periode, wahana, pembayaran, dan status.
      */
     public function index(Request $request): View
     {
@@ -25,10 +26,22 @@ class LaporanController extends Controller
         $kapalId = $request->input('kapal_id', 'all');
         $status = $request->input('status', 'all');
         $metodePembayaran = $request->input('metode_pembayaran', 'all');
+        $tanggalMulai = $request->input('tanggal_mulai');
+        $tanggalSelesai = $request->input('tanggal_selesai');
 
-        $baseQuery = Tiket::with('kapal')
-            ->whereMonth('tanggal_pemesanan', $bulan)
-            ->whereYear('tanggal_pemesanan', $tahun);
+        $baseQuery = Tiket::with('kapal');
+
+        if ($request->filled('tanggal_mulai') || $request->filled('tanggal_selesai')) {
+            if ($request->filled('tanggal_mulai')) {
+                $baseQuery->whereDate('tanggal_pemesanan', '>=', $tanggalMulai);
+            }
+            if ($request->filled('tanggal_selesai')) {
+                $baseQuery->whereDate('tanggal_pemesanan', '<=', $tanggalSelesai);
+            }
+        } else {
+            $baseQuery->whereMonth('tanggal_pemesanan', $bulan)
+                ->whereYear('tanggal_pemesanan', $tahun);
+        }
 
         if ($kapalId !== 'all' && $kapalId !== '' && $kapalId !== null) {
             $baseQuery->where('kapal_id', (int) $kapalId);
@@ -55,10 +68,20 @@ class LaporanController extends Controller
         $tiketPending = (clone $statsQuery)->where('status', Tiket::STATUS_PENDING)->count();
         $tiketBatal = (clone $statsQuery)->where('status', Tiket::STATUS_BATAL)->count();
 
-        // Rekap pengeluaran bulan terpilih & laba bersih
-        $totalPengeluaran = (float) Pengeluaran::whereMonth('tanggal_pengeluaran', $bulan)
-            ->whereYear('tanggal_pengeluaran', $tahun)
-            ->sum('nominal');
+        // Rekap pengeluaran periode terpilih & laba bersih
+        $pengeluaranQuery = Pengeluaran::query();
+        if ($request->filled('tanggal_mulai') || $request->filled('tanggal_selesai')) {
+            if ($request->filled('tanggal_mulai')) {
+                $pengeluaranQuery->whereDate('tanggal_pengeluaran', '>=', $tanggalMulai);
+            }
+            if ($request->filled('tanggal_selesai')) {
+                $pengeluaranQuery->whereDate('tanggal_pengeluaran', '<=', $tanggalSelesai);
+            }
+        } else {
+            $pengeluaranQuery->whereMonth('tanggal_pengeluaran', $bulan)
+                ->whereYear('tanggal_pengeluaran', $tahun);
+        }
+        $totalPengeluaran = (float) $pengeluaranQuery->sum('nominal');
         $labaBersih = $totalPendapatan - $totalPengeluaran;
 
         // Data transaksi dipaginate 20 per halaman
@@ -83,6 +106,8 @@ class LaporanController extends Controller
             'kapalId',
             'status',
             'metodePembayaran',
+            'tanggalMulai',
+            'tanggalSelesai',
             'totalTransaksi',
             'totalPendapatan',
             'pendapatanTunai',
@@ -110,12 +135,27 @@ class LaporanController extends Controller
         $kapalId = $request->input('kapal_id', 'all');
         $status = $request->input('status', 'all');
         $metodePembayaran = $request->input('metode_pembayaran', 'all');
+        $tanggalMulai = $request->input('tanggal_mulai');
+        $tanggalSelesai = $request->input('tanggal_selesai');
 
-        $query = Tiket::with('kapal')
-            ->whereMonth('tanggal_pemesanan', $bulan)
-            ->whereYear('tanggal_pemesanan', $tahun);
+        $query = Tiket::with('kapal');
 
         $filterParts = [];
+
+        if ($request->filled('tanggal_mulai') || $request->filled('tanggal_selesai')) {
+            if ($request->filled('tanggal_mulai')) {
+                $query->whereDate('tanggal_pemesanan', '>=', $tanggalMulai);
+            }
+            if ($request->filled('tanggal_selesai')) {
+                $query->whereDate('tanggal_pemesanan', '<=', $tanggalSelesai);
+            }
+            $startFmt = $request->filled('tanggal_mulai') ? Carbon::parse($tanggalMulai)->format('d M Y') : 'Awal';
+            $endFmt = $request->filled('tanggal_selesai') ? Carbon::parse($tanggalSelesai)->format('d M Y') : 'Sekarang';
+            $filterParts[] = "Tanggal: {$startFmt} s/d {$endFmt}";
+        } else {
+            $query->whereMonth('tanggal_pemesanan', $bulan)
+                ->whereYear('tanggal_pemesanan', $tahun);
+        }
 
         if ($kapalId !== 'all' && $kapalId !== '' && $kapalId !== null) {
             $query->where('kapal_id', (int) $kapalId);
@@ -157,9 +197,19 @@ class LaporanController extends Controller
         $tiketPending = (clone $statsQuery)->where('status', Tiket::STATUS_PENDING)->count();
         $tiketBatal = (clone $statsQuery)->where('status', Tiket::STATUS_BATAL)->count();
 
-        $pengeluarans = Pengeluaran::with('user')
-            ->whereMonth('tanggal_pengeluaran', $bulan)
-            ->whereYear('tanggal_pengeluaran', $tahun)
+        $pengeluaranQuery = Pengeluaran::with('user');
+        if ($request->filled('tanggal_mulai') || $request->filled('tanggal_selesai')) {
+            if ($request->filled('tanggal_mulai')) {
+                $pengeluaranQuery->whereDate('tanggal_pengeluaran', '>=', $tanggalMulai);
+            }
+            if ($request->filled('tanggal_selesai')) {
+                $pengeluaranQuery->whereDate('tanggal_pengeluaran', '<=', $tanggalSelesai);
+            }
+        } else {
+            $pengeluaranQuery->whereMonth('tanggal_pengeluaran', $bulan)
+                ->whereYear('tanggal_pengeluaran', $tahun);
+        }
+        $pengeluarans = $pengeluaranQuery
             ->orderBy('tanggal_pengeluaran', 'asc')
             ->orderBy('id', 'asc')
             ->get();
@@ -217,10 +267,22 @@ class LaporanController extends Controller
         $kapalId = $request->input('kapal_id', 'all');
         $status = $request->input('status', 'all');
         $metodePembayaran = $request->input('metode_pembayaran', 'all');
+        $tanggalMulai = $request->input('tanggal_mulai');
+        $tanggalSelesai = $request->input('tanggal_selesai');
 
-        $query = Tiket::with('kapal')
-            ->whereMonth('tanggal_pemesanan', $bulan)
-            ->whereYear('tanggal_pemesanan', $tahun);
+        $query = Tiket::with('kapal');
+
+        if ($request->filled('tanggal_mulai') || $request->filled('tanggal_selesai')) {
+            if ($request->filled('tanggal_mulai')) {
+                $query->whereDate('tanggal_pemesanan', '>=', $tanggalMulai);
+            }
+            if ($request->filled('tanggal_selesai')) {
+                $query->whereDate('tanggal_pemesanan', '<=', $tanggalSelesai);
+            }
+        } else {
+            $query->whereMonth('tanggal_pemesanan', $bulan)
+                ->whereYear('tanggal_pemesanan', $tahun);
+        }
 
         if ($kapalId !== 'all' && $kapalId !== '' && $kapalId !== null) {
             $query->where('kapal_id', (int) $kapalId);
